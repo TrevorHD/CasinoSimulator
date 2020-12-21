@@ -50,8 +50,7 @@ while betStage >= 1:
         print("At any time in the betting process, enter \"b\" to go back.")
         inputError = False
         betType = input("Please enter a bet type: ")
-        if betType not in ["single", "split", "square", "street", "doublestreet", "trio", "firstfour", "low", "high", 
-                           "black", "red", "odd", "even", "dozen", "coulmn", "snake"]:
+        if betType not in df.index:
             inputError = True
         else:
             betStage = betStage + 1
@@ -474,7 +473,8 @@ while betStage >= 1:
             print("\n")
         print("Your winning number(s):", *betNumber)
         print("You are betting", betAmount, "credits.")
-        print("Odds 36:1, payout of", int(betAmount)*35, "credits at 35:1 if successful.")
+        print("Odds", df.loc[betType]["odds"], "with", df.loc[betType]["payout"], "payout of", 
+              int(betAmount)*int(df.loc[betType]["multiplier"]), "credits if successful.")
         inputError = False
         betConfirm = input("Proceed? Y/N: ")
         if betConfirm in ["b", "N", "n", "No", "no"]:
