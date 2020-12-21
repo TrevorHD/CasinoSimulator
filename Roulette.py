@@ -11,6 +11,7 @@ clear()
 
 import pandas as pd
 import numpy as np
+import random
 
 df = pd.DataFrame(data=np.array([["36:1",     "35:1",  35],
                                  ["17.5:1",   "17:1",  17],
@@ -46,7 +47,6 @@ while betStage >= 1:
             print("Invalid input, try again.", "\n")
         else:
             print("\n")
-        print("Enter \"r\" on this screen to reuse your previous bet.")
         print("At any time in the betting process, enter \"b\" to go back.")
         inputError = False
         betType = input("Please enter a bet type: ")
@@ -480,7 +480,41 @@ while betStage >= 1:
         if betConfirm in ["b", "N", "n", "No", "no"]:
             betStage = betStage - 1
         elif betConfirm in ["Y", "y", "Yes", "yes"]:
-            betStage = 0
+            betStage = 5
         else:
             inputError = True
             
+    while betStage == 5:
+        clear()
+        winningNumber = random.sample(list(map(str, range(0, 37, 1))), 1)
+        print("-"*5, "STEP 5: Results", "-"*93, "\n")
+        if inputError == 1:
+            print("Insufficient funds to reuse previous bet. You might want to go home...", "\n")
+        elif inputError == 2:
+            print("Invalid input, try again.", "\n")
+        else:
+            print("\n")
+        print("Winning number:", *winningNumber)
+        print("Your winning number(s):", *betNumber)
+        if str(*winningNumber) in betNumber:
+            winnings = int(betAmount)*int(df.loc[betType]["multiplier"])
+            balance = balance + winnings
+            print("You won", winnings, "credits. Your balance is now", balance, "credits.")
+        else:
+            balance = balance - int(betAmount)
+            print("You lost", betAmount, "credits. Your balance is now", balance, "credits.")
+        inputError = False
+        betReuse = input("Would you like use your previous bet again? Y/N: ")
+        if betReuse in ["b", "N", "n", "No", "no"]:
+            betStage = 1
+        elif betReuse in ["Y", "y", "Yes", "yes"]:
+            if balance < betAmount:
+                inputError = 1
+            else:
+                betStage = 5
+        else:
+            inputError = 2
+        
+
+        
+        
