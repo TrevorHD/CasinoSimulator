@@ -29,13 +29,16 @@ df = pd.DataFrame(data=np.array([["36:1",     "35:1",  35],
                                  ["2.083:1",  "2:1",   2 ],
                                  ["2.083:1",  "2:1",   2 ],
                                  ["2.083:1",  "2:1",   2 ]]),
-                  index = ["single", "split", "square", "street", "doublestreet", "trio", "firstfour",
+                  index = ["single", "split", "square", "street", "doublestreet", "trio", "basket",
                            "low", "high", "black", "red", "odd", "even", "dozen", "column", "snake"],
                   columns = ["odds", "payout", "multiplier"])
 
 balance = 1000
 betStage = 1
 inputError = False
+cheatMessage = 0
+cheatL = False
+cheatS = False
 
 
 while betStage >= 1:
@@ -47,9 +50,13 @@ while betStage >= 1:
             print("Invalid input, try again.", "\n")
         else:
             print("\n")
-        print("At any time in the betting process, enter \"b\" to go back.")
+        print("At any time in the betting process, enter \"b\" to go back.", "\n")
+        print("Inner bets are less likely to win but have higher payouts, and include:")
+        print("single, split, square, street, doublestreet, trio, and basket.", "\n")
+        print("Outer bets are more likely to win but have lower payouts, and include:")
+        print("low, high, black, red, odd, even, dozen, column, and snake.", "\n")
         inputError = False
-        betType = input("Please enter a bet type: ")
+        betType = input("Please enter a bet type from one of the lists above, exactly as it appears: ")
         if betType not in df.index:
             inputError = True
         else:
@@ -63,10 +70,10 @@ while betStage >= 1:
             print("Invalid input, try again.", "\n")
         else:
             print("\n")
-        print("Straight/single bets involve only one number.")
-        print("Odds of", df.loc[betType]["odds"], "and payout of", df.loc[betType]["payout"], "\n")
+        print("Single/straight bets involve betting on only one number.")
+        print("Odds", df.loc[betType]["odds"], "against winning; payout", df.loc[betType]["payout"], "if successful.", "\n")
         inputError = False
-        betNumber = input("Please enter a whole number, 0-36: ")
+        betNumber = input("Please enter a number in between 0 and 36: ")
         if betNumber == "b":
             betStage = betStage - 1
         elif betNumber not in list(map(str, range(0, 37, 1))):
@@ -82,10 +89,10 @@ while betStage >= 1:
             print("Invalid input, try again.", "\n")
         else:
             print("\n")
-        print("Splits (2 numbers) consist of any 2 numbers adjacent on the board.")
-        print("Odds of", df.loc[betType]["odds"], "and payout of", df.loc[betType]["payout"], "\n")
+        print("Split bets involve betting on any 2 numbers that are adjacent on the board.")
+        print("Odds", df.loc[betType]["odds"], "against winning; payout", df.loc[betType]["payout"], "if successful.", "\n")
         inputError = False
-        betNumber = input("Please enter a whole number, 0-36: ")
+        betNumber = input("Please enter a number in between 0 and 36: ")
         if betNumber == "b":
             betStage = betStage - 1
         elif betNumber == "0":
@@ -145,9 +152,9 @@ while betStage >= 1:
             print("Invalid input, try again.", "\n")
         else:
             print("\n")
-        print("Squares (4 numbers) consist of numbers n, n+1, n+3, and n+4.")
+        print("Square/corner bets consist of four numbers n, n+1, n+3, and n+4 that are adjacent on the board.")
         print("Choices include 34, 35, and any multiples of 3.")
-        print("Odds of", df.loc[betType]["odds"], "and payout of", df.loc[betType]["payout"], "\n")
+        print("Odds", df.loc[betType]["odds"], "against winning; payout", df.loc[betType]["payout"], "if successful.", "\n")
         inputError = False
         betNumber = input("Please enter a starting number from the list above: ")
         if betNumber == "b":
@@ -167,8 +174,9 @@ while betStage >= 1:
             print("Invalid input, try again.", "\n")
         else:
             print("\n")
-        print("Streets (3 consecutive numbers) start with 1, 4, 7, 10, 13, 16, 19, 22, 25, 28, 31, 34.")
-        print("Odds of", df.loc[betType]["odds"], "and payout of", df.loc[betType]["payout"], "\n")
+        print("Street bets involve 3 consecutive numbers that form a row on the board.")
+        print("Streets can start with 1, 4, 7, 10, 13, 16, 19, 22, 25, 28, 31, and 34.")
+        print("Odds", df.loc[betType]["odds"], "against winning; payout", df.loc[betType]["payout"], "if successful.", "\n")
         inputError = False
         betNumber = input("Please enter a starting number from the list above: ")
         if betNumber == "b":
@@ -187,8 +195,9 @@ while betStage >= 1:
             print("Invalid input, try again.", "\n")
         else:
             print("\n")
-        print("Double streets (6 consecutive numbers) start with 1, 4, 7, 10, 13, 16, 19, 22, 25, 28, 31.")
-        print("Odds of", df.loc[betType]["odds"], "and payout of", df.loc[betType]["payout"], "\n")
+        print("Double street bets involve 6 consecutive numbers that form two rows on the board.")
+        print("Double streets can start with 1, 4, 7, 10, 13, 16, 19, 22, 25, 28, and 31.")
+        print("Odds", df.loc[betType]["odds"], "against winning; payout", df.loc[betType]["payout"], "if successful.", "\n")
         inputError = False
         betNumber = input("Please enter a starting number from the list above: ")
         if betNumber == "b":
@@ -208,10 +217,11 @@ while betStage >= 1:
             print("Invalid input, try again.", "\n")
         else:
             print("\n")
-        print("Trios consist of numbers 0 and either 1/2 or 2/3.")
-        print("Odds of", df.loc[betType]["odds"], "and payout of", df.loc[betType]["payout"], "\n")
+        print("Trio bets involve a group of numbers containing 0 and either 1/2 or 2/3.")
+        print("The first trio is 0, 1, and 2; the second trio is 0, 2, and 3.")
+        print("Odds", df.loc[betType]["odds"], "against winning; payout", df.loc[betType]["payout"], "if successful.", "\n")
         inputError = False
-        betNumber = input("First (0, 1, 2) or second (0, 2, 3) trio: ")
+        betNumber = input("First or second trio: ")
         if betNumber == "b":
             betStage = betStage - 1
         elif betNumber in ["First", "first", "1st", "1"]:
@@ -223,16 +233,16 @@ while betStage >= 1:
         else:
             inputError = True
     
-    # Inner bet: first four (numbers 0, 1, 2, 3) 
-    while betStage == 2 and betType == "firstfour":
+    # Inner bet: basket (numbers 0, 1, 2, 3) 
+    while betStage == 2 and betType == "basket":
         clear()
         print("-"*5, "STEP 2: Select Numbers", "-"*86, "\n")
         if inputError == True:
             print("Invalid input, try again.", "\n")
         else:
             print("\n")
-        print("First four consists of numbers 0, 1, 2, and 3.")
-        print("Odds of", df.loc[betType]["odds"], "and payout of", df.loc[betType]["payout"], "\n")
+        print("Basket bets involve a group of the first four numbers (0, 1, 2, and 3).")
+        print("Odds", df.loc[betType]["odds"], "against winning; payout", df.loc[betType]["payout"], "if successful.", "\n")
         inputError = False
         betNumber = input("Proceed? Y/N: ")
         if betNumber in ["b", "N", "n", "No", "no"]:
@@ -251,8 +261,8 @@ while betStage >= 1:
             print("Invalid input, try again.", "\n")
         else:
             print("\n")
-        print("Low bets consist of numbers 1-18.")
-        print("Odds of", df.loc[betType]["odds"], "and payout of", df.loc[betType]["payout"], "\n")
+        print("Low bets involve betting on all numbers 1-18.")
+        print("Odds", df.loc[betType]["odds"], "against winning; payout", df.loc[betType]["payout"], "if successful.", "\n")
         inputError = False
         betNumber = input("Proceed? Y/N: ")
         if betNumber in ["b", "N", "n", "No", "no"]:
@@ -271,8 +281,8 @@ while betStage >= 1:
             print("Invalid input, try again.", "\n")
         else:
             print("\n")
-        print("High bets consist of numbers 19-36.")
-        print("Odds of", df.loc[betType]["odds"], "and payout of", df.loc[betType]["payout"], "\n")
+        print("High bets involve betting on all numbers 19-36.")
+        print("Odds", df.loc[betType]["odds"], "against winning; payout", df.loc[betType]["payout"], "if successful.", "\n")
         inputError = False
         betNumber = input("Proceed? Y/N: ")
         if betNumber in ["b", "N", "n", "No", "no"]:
@@ -291,8 +301,9 @@ while betStage >= 1:
             print("Invalid input, try again.", "\n")
         else:
             print("\n")
-        print("Black bets consist of evens 1-10, odds 11-18, evens 19-28, and odds 29-36.")
-        print("Odds of", df.loc[betType]["odds"], "and payout of", df.loc[betType]["payout"], "\n")
+        print("Black bets involve betting on all black numbers on the board.")
+        print("This includes even numbers from 1-10 and 19-28, and odd numbers from 11-18 and 29-36.")
+        print("Odds", df.loc[betType]["odds"], "against winning; payout", df.loc[betType]["payout"], "if successful.", "\n")
         inputError = False
         betNumber = input("Proceed? Y/N: ")
         if betNumber in ["b", "N", "n", "No", "no"]:
@@ -311,8 +322,9 @@ while betStage >= 1:
             print("Invalid input, try again.", "\n")
         else:
             print("\n")
-        print("Red bets consist of odds 1-10, evens 11-18, odds 19-28, and evens 29-36.")
-        print("Odds of", df.loc[betType]["odds"], "and payout of", df.loc[betType]["payout"], "\n")
+        print("Red bets involve betting on all red numbers on the board.")
+        print("This includes odd numbers from 1-10 and 19-28, and even numbers from 11-18 and 29-36.")
+        print("Odds", df.loc[betType]["odds"], "against winning; payout", df.loc[betType]["payout"], "if successful.", "\n")
         inputError = False
         betNumber = input("Proceed? Y/N: ")
         if betNumber in ["b", "N", "n", "No", "no"]:
@@ -331,8 +343,8 @@ while betStage >= 1:
             print("Invalid input, try again.", "\n")
         else:
             print("\n")
-        print("Odd bets consist of all odd numbers between 1 and 36.")
-        print("Odds of", df.loc[betType]["odds"], "and payout of", df.loc[betType]["payout"], "\n")
+        print("Odd bets involve betting on all odd numbers on the board. This exculdes zero.")
+        print("Odds", df.loc[betType]["odds"], "against winning; payout", df.loc[betType]["payout"], "if successful.", "\n")
         inputError = False
         betNumber = input("Proceed? Y/N: ")
         if betNumber in ["b", "N", "n", "No", "no"]:
@@ -351,8 +363,8 @@ while betStage >= 1:
             print("Invalid input, try again.", "\n")
         else:
             print("\n")
-        print("Even bets consist of all even numbers between 1 and 36.")
-        print("Odds of", df.loc[betType]["odds"], "and payout of", df.loc[betType]["payout"], "\n")
+        print("Even bets involve betting on all even numbers on the board. This exculdes zero.")
+        print("Odds", df.loc[betType]["odds"], "against winning; payout", df.loc[betType]["payout"], "if successful.", "\n")
         inputError = False
         betNumber = input("Proceed? Y/N: ")
         if betNumber in ["b", "N", "n", "No", "no"]:
@@ -371,8 +383,9 @@ while betStage >= 1:
             print("Invalid input, try again.", "\n")
         else:
             print("\n")
-        print("Dozen bets consist of numbers 1-12, 13-24, or 25-36")
-        print("Odds of", df.loc[betType]["odds"], "and payout of", df.loc[betType]["payout"], "\n")
+        print("Dozen bets involve numbers in one of the three dozens. This exculdes zero.")
+        print("The first dozen contains numbers 1-12, the second numbers 13-24, and the third numbers 25-36.")
+        print("Odds", df.loc[betType]["odds"], "against winning; payout", df.loc[betType]["payout"], "if successful.", "\n")
         inputError = False
         betNumber = input("First, second, or third dozen: ")
         if betNumber == "b":
@@ -397,8 +410,11 @@ while betStage >= 1:
             print("Invalid input, try again.", "\n")
         else:
             print("\n")
-        print("Column bets consist of FILLER TEXT.")
-        print("Odds of", df.loc[betType]["odds"], "and payout of", df.loc[betType]["payout"], "\n")
+        print("Column bets involve betting on an entire column of numbers on the board. This exculdes zero.")
+        print("The first column contains numbers 1, 4, 7, 10, 13, 16, 19, 22, 25, 28, 31, and 34.")
+        print("The second column contains numbers 2, 5, 8, 11, 14, 17, 20, 23, 26, 29, 32, and 35.")
+        print("The third column contains numbers 3, 6, 9, 12, 15, 18, 21, 24, 27, 30, 33, and 36.")
+        print("Odds", df.loc[betType]["odds"], "against winning; payout", df.loc[betType]["payout"], "if successful.", "\n")
         inputError = False
         betNumber = input("First, second, or third column: ")
         if betNumber == "b":
@@ -423,8 +439,9 @@ while betStage >= 1:
             print("Invalid input, try again.", "\n")
         else:
             print("\n")
-        print("Snake bets consist of numbers 1, 5, 9, 12, 14, 16, 19, 23, 27, 30, 32, and 34.")
-        print("Odds of", df.loc[betType]["odds"], "and payout of", df.loc[betType]["payout"], "\n")
+        print("Snake bets involve betting on a set of numbers that form a snake-like pattern on the board.")
+        print("These numbers are 1, 5, 9, 12, 14, 16, 19, 23, 27, 30, 32, and 34.")
+        print("Odds", df.loc[betType]["odds"], "against winning; payout", df.loc[betType]["payout"], "if successful.", "\n")
         inputError = False
         betNumber = input("Proceed? Y/N: ")
         if betNumber in ["b", "N", "n", "No", "no"]:
@@ -445,13 +462,35 @@ while betStage >= 1:
             print("Please enter a number greater than zero.", "\n")
         elif inputError == 3:
             print("Invalid input, try again.", "\n")
+        elif cheatMessage == 1:
+            print("2000 credits added to your balance. Gambling on credit seems a bit irresponsible, no?", "\n")
+        elif cheatMessage == 2:
+            print("1000 credits added to your balance. Who needs savings anyway?", "\n")
+        elif cheatMessage == 3:
+            print("You've already used this cheat code!", "\n")
         else:
             print("\n")
         print("You have", balance, "credits remaining in your account.")
         inputError = False
+        cheatMessage = 0
         betAmount = input("Please enter a whole amount to wager: ")
         if betAmount == "b":
             betStage = betStage - 1
+        elif betAmount in ["Loan", "loan"]:
+            if cheatL == True:
+                cheatMessage = 3
+            else:
+                balance = balance + 2000
+                cheatMessage = 1
+                cheatL = True
+        elif betAmount in ["Savings Account", "Savings account", "savings account", "savings Account", 
+                           "SavingsAccount", "Savingsaccount", "savingsaccount", "savingsAccount"]:
+            if cheatS == True:
+                cheatMessage = 3
+            else:
+                balance = balance + 1000
+                cheatMessage = 2
+                cheatS = True
         else:
             try:
                 if int(betAmount) > balance:
