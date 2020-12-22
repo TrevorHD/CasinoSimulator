@@ -1,38 +1,43 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Dec 18 11:08:32 2020
+# ----- Import packages -----------------------------------------------------------------------------------------------------
 
-@author: Trevor Drees
-"""
-
-import os
-def clear(): os.system('cls') #on Windows System
-clear()
-
+# Import packages
 import pandas as pd
 import numpy as np
 import random
 
-df = pd.DataFrame(data=np.array([["36:1",     "35:1",  35],
-                                 ["17.5:1",   "17:1",  17],
-                                 ["8.25:1",   "8:1",   8 ],
-                                 ["11.333:1", "11:1",  11],
-                                 ["5.167:1",  "5:1",   5 ],
-                                 ["11.333:1", "11:1",  11],
-                                 ["8.25:1",   "8:1",   8 ],
-                                 ["1.056:1",  "1:1",   1 ],
-                                 ["1.056:1",  "1:1",   1 ],
-                                 ["1.056:1",  "1:1",   1 ],
-                                 ["1.056:1",  "1:1",   1 ],
-                                 ["1.056:1",  "1:1",   1 ],
-                                 ["1.056:1",  "1:1",   1 ],
-                                 ["2.083:1",  "2:1",   2 ],
-                                 ["2.083:1",  "2:1",   2 ],
-                                 ["2.083:1",  "2:1",   2 ]]),
+# Define function to clear text from console
+import os
+def clear(): os.system('cls') #on Windows System
+clear()
+
+
+
+
+
+# ----- Pre-run setup -------------------------------------------------------------------------------------------------------
+
+# Create table of bet types, odds, and payouts
+df = pd.DataFrame(data = np.array([["36:1",     "35:1",  35],
+                                   ["17.5:1",   "17:1",  17],
+                                   ["8.25:1",   "8:1",   8 ],
+                                   ["11.333:1", "11:1",  11],
+                                   ["5.167:1",  "5:1",   5 ],
+                                   ["11.333:1", "11:1",  11],
+                                   ["8.25:1",   "8:1",   8 ],
+                                   ["1.056:1",  "1:1",   1 ],
+                                   ["1.056:1",  "1:1",   1 ],
+                                   ["1.056:1",  "1:1",   1 ],
+                                   ["1.056:1",  "1:1",   1 ],
+                                   ["1.056:1",  "1:1",   1 ],
+                                   ["1.056:1",  "1:1",   1 ],
+                                   ["2.083:1",  "2:1",   2 ],
+                                   ["2.083:1",  "2:1",   2 ],
+                                   ["2.083:1",  "2:1",   2 ]]),
                   index = ["single", "split", "square", "street", "doublestreet", "trio", "basket",
                            "low", "high", "black", "red", "odd", "even", "dozen", "column", "snake"],
                   columns = ["odds", "payout", "multiplier"])
 
+# Set initial values
 balance = 1000
 betStage = 1
 inputError = False
@@ -41,27 +46,45 @@ cheatL = False
 cheatS = False
 
 
+
+
+
+# ----- Run game ------------------------------------------------------------------------------------------------------------
+
+# Start running the game
 while betStage >= 1:
     
+    # ----- Step 1: Select Bet ------------------------------------------------
+    
+    # Initial screen and betting prompt
     while betStage == 1:
         clear()
         print("-"*5, "STEP 1: Select Bet", "-"*90, "\n")
-        if inputError == True:
+        if inputError == 1:
+            print("No previous menu to return to.", "\n")
+        elif inputError == 2:
             print("Invalid input, try again.", "\n")
         else:
             print("\n")
-        print("At any time in the betting process, enter \"b\" to go back.", "\n")
+        print("At any time in the betting process, enter \"b\" to go back to the previous menu.")
+        print("While on this screen, enter \"q\" to quit.", "\n")
         print("Inner bets are less likely to win but have higher payouts, and include:")
         print("single, split, square, street, doublestreet, trio, and basket.", "\n")
         print("Outer bets are more likely to win but have lower payouts, and include:")
         print("low, high, black, red, odd, even, dozen, column, and snake.", "\n")
         inputError = False
         betType = input("Please enter a bet type from one of the lists above, exactly as it appears: ")
-        if betType not in df.index:
-            inputError = True
+        if betType == "b":
+            inputError = 1
+        elif betType == "q":
+            betStage = 0
+        elif betType not in df.index:
+            inputError = 2
         else:
             betStage = betStage + 1
-        
+    
+    # ----- Step 2: Select Numbers (Inner Bets) -------------------------------  
+    
     # Inner bet: straight/single (one number)
     while betStage == 2 and betType == "single":
         clear()
@@ -123,8 +146,7 @@ while betStage >= 1:
                 nextNumber = [int(betNumber) - 3, int(betNumber) - 1, int(betNumber) + 3]
             betStage = betStage + 0.5
         else:
-            inputError = True
-            
+            inputError = True        
     while betStage == 2.5:
         clear()
         print("-"*5, "STEP 2: Select Numbers", "-"*86, "\n")
@@ -252,6 +274,8 @@ while betStage >= 1:
             betStage = betStage + 1
         else:
             inputError = True
+    
+    # ----- Step 2: Select Numbers (Outer Bets) -------------------------------  
     
     # Outer bet: low (numbers 1-18)
     while betStage == 2 and betType == "low":
@@ -452,6 +476,8 @@ while betStage >= 1:
         else:
             inputError = True
     
+    # ----- Step 3: Select Wager ----------------------------------------------
+    
     # Choose amount to bet
     while betStage == 3:
         clear()
@@ -502,6 +528,8 @@ while betStage >= 1:
             except ValueError:
                 inputError = 3
 
+    # ----- Step 4: Confirm Bet -----------------------------------------------
+
     # Confirm bet
     while betStage == 4:
         clear()
@@ -513,7 +541,7 @@ while betStage >= 1:
         print("Your winning number(s):", *betNumber)
         print("You are betting", betAmount, "credits.")
         print("Odds", df.loc[betType]["odds"], "with", df.loc[betType]["payout"], "payout of", 
-              int(betAmount)*int(df.loc[betType]["multiplier"]), "credits if successful.")
+              int(betAmount)*int(df.loc[betType]["multiplier"]), "credits if successful.", "\n")
         inputError = False
         betConfirm = input("Proceed? Y/N: ")
         if betConfirm in ["b", "N", "n", "No", "no"]:
@@ -522,6 +550,8 @@ while betStage >= 1:
             betStage = 5
         else:
             inputError = True
+    
+    # ----- Step 5: Run numbers -----------------------------------------------  
     
     # Bet outcomes and prompt to reuse bet
     while betStage == 5:
@@ -552,6 +582,7 @@ while betStage >= 1:
                 balanceText = "You lost " + str(betAmount) + " credits. Your balance is now " + str(balance) + " credits."
                 print(balanceText)
         inputError = False
+        print("")
         betReuse = input("Would you like use your previous bet again? Y/N: ")
         if betReuse in ["b", "N", "n", "No", "no"]:
             betStage = 1
