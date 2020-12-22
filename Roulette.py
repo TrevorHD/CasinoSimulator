@@ -483,38 +483,44 @@ while betStage >= 1:
             betStage = 5
         else:
             inputError = True
-            
+    
+    # Bet outcomes and prompt to reuse bet
     while betStage == 5:
         clear()
-        winningNumber = random.sample(list(map(str, range(0, 37, 1))), 1)
         print("-"*5, "STEP 5: Results", "-"*93, "\n")
         if inputError == 1:
             print("Insufficient funds to reuse previous bet. You might want to go home...", "\n")
+            print("Winning number:", *winningNumber)
+            print("Your winning number(s):", *betNumber)
+            print(balanceText)
         elif inputError == 2:
             print("Invalid input, try again.", "\n")
+            print("Winning number:", *winningNumber)
+            print("Your winning number(s):", *betNumber)
+            print(balanceText)
         else:
             print("\n")
-        print("Winning number:", *winningNumber)
-        print("Your winning number(s):", *betNumber)
-        if str(*winningNumber) in betNumber:
-            winnings = int(betAmount)*int(df.loc[betType]["multiplier"])
-            balance = balance + winnings
-            print("You won", winnings, "credits. Your balance is now", balance, "credits.")
-        else:
-            balance = balance - int(betAmount)
-            print("You lost", betAmount, "credits. Your balance is now", balance, "credits.")
+            winningNumber = random.sample(list(map(str, range(0, 37, 1))), 1)
+            print("Winning number:", *winningNumber)
+            print("Your winning number(s):", *betNumber)
+            if str(*winningNumber) in betNumber:
+                winnings = int(betAmount)*int(df.loc[betType]["multiplier"])
+                balance = balance + winnings
+                balanceText = "You won " + str(winnings) + " credits. Your balance is now " + str(balance) + " credits."
+                print(balanceText)
+            else:
+                balance = balance - int(betAmount)
+                balanceText = "You lost " + str(betAmount) + " credits. Your balance is now " + str(balance) + " credits."
+                print(balanceText)
         inputError = False
         betReuse = input("Would you like use your previous bet again? Y/N: ")
         if betReuse in ["b", "N", "n", "No", "no"]:
             betStage = 1
         elif betReuse in ["Y", "y", "Yes", "yes"]:
-            if balance < betAmount:
+            if balance < int(betAmount):
                 inputError = 1
             else:
                 betStage = 5
         else:
             inputError = 2
-        
-
-        
         
