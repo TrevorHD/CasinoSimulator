@@ -39,7 +39,7 @@ df = pd.DataFrame(data = np.array([["36:1",     "35:1",  35],
 
 # Set initial values
 balance = 1000
-betStage = 1
+gameStage = 1
 inputError = False
 cheatMessage = 0
 cheatL = False
@@ -52,12 +52,12 @@ cheatS = False
 # ----- Run game ------------------------------------------------------------------------------------------------------------
 
 # Start running the game
-while betStage >= 1:
+while gameStage >= 1:
     
     # ----- Step 1: Select Bet ------------------------------------------------
     
     # Initial screen and betting prompt
-    while betStage == 1:
+    while gameStage == 1:
         clear()
         print("-"*5, "STEP 1: Select Bet", "-"*90, "\n")
         if inputError == 1:
@@ -77,16 +77,16 @@ while betStage >= 1:
         if betType == "b":
             inputError = 1
         elif betType == "q":
-            betStage = 0
+            gameStage = 0
         elif betType not in df.index:
             inputError = 2
         else:
-            betStage = betStage + 1
+            gameStage = gameStage + 1
     
     # ----- Step 2: Select Numbers (Inner Bets) -------------------------------  
     
     # Inner bet: straight/single (one number)
-    while betStage == 2 and betType == "single":
+    while gameStage == 2 and betType == "single":
         clear()
         print("-"*5, "STEP 2: Select Numbers", "-"*86, "\n")
         if inputError == True:
@@ -98,14 +98,14 @@ while betStage >= 1:
         inputError = False
         betNumber = input("Please enter a number in between 0 and 36: ")
         if betNumber == "b":
-            betStage = betStage - 1
+            gameStage = gameStage - 1
         elif betNumber not in list(map(str, range(0, 37, 1))):
             inputError = True
         else:
-            betStage = betStage + 1
+            gameStage = gameStage + 1
             
     # Inner bet: split (2 board-adjacent numbers)        
-    while betStage == 2 and betType == "split":
+    while gameStage == 2 and betType == "split":
         clear()
         print("-"*5, "STEP 2: Select Numbers", "-"*86, "\n")
         if inputError == True:
@@ -117,10 +117,10 @@ while betStage >= 1:
         inputError = False
         betNumber = input("Please enter a number in between 0 and 36: ")
         if betNumber == "b":
-            betStage = betStage - 1
+            gameStage = gameStage - 1
         elif betNumber == "0":
             nextNumber = [1, 2, 3]
-            betStage = betStage + 0.5
+            gameStage = gameStage + 0.5
         elif betNumber in list(map(str, range(1, 35, 3))):
             if int(betNumber) == 1:
                 nextNumber = [0, int(betNumber) + 1, int(betNumber) + 3]
@@ -128,7 +128,7 @@ while betStage >= 1:
                 nextNumber = [int(betNumber) - 3, int(betNumber) + 1]
             else:
                 nextNumber = [int(betNumber) - 3, int(betNumber) + 1, int(betNumber) + 3]
-            betStage = betStage + 0.5
+            gameStage = gameStage + 0.5
         elif betNumber in list(map(str, range(2, 36, 3))):
             if int(betNumber) == 2:
                 nextNumber = [0, int(betNumber) - 1, int(betNumber) + 1, int(betNumber) + 3]
@@ -136,7 +136,7 @@ while betStage >= 1:
                 nextNumber = [int(betNumber) - 3, int(betNumber) - 1, int(betNumber) + 1]
             else:
                 nextNumber = [int(betNumber) - 3, int(betNumber) - 1, int(betNumber) + 1, int(betNumber) + 3]
-            betStage = betStage + 0.5
+            gameStage = gameStage + 0.5
         elif betNumber in list(map(str, range(3, 37, 3))):
             if int(betNumber) == 3:
                 nextNumber = [0, int(betNumber) - 1, int(betNumber) + 3]
@@ -144,10 +144,10 @@ while betStage >= 1:
                 nextNumber = [int(betNumber) - 3, int(betNumber) - 1]
             else:
                 nextNumber = [int(betNumber) - 3, int(betNumber) - 1, int(betNumber) + 3]
-            betStage = betStage + 0.5
+            gameStage = gameStage + 0.5
         else:
             inputError = True        
-    while betStage == 2.5:
+    while gameStage == 2.5:
         clear()
         print("-"*5, "STEP 2: Select Numbers", "-"*86, "\n")
         if inputError == True:
@@ -159,15 +159,15 @@ while betStage >= 1:
         betNumber2 = input("Please enter one of the numbers above: ")
         nextNumber = list(map(str, nextNumber))
         if betNumber2 == "b":
-            betStage = betStage - 0.5
+            gameStage = gameStage - 0.5
         elif betNumber2 in nextNumber:
             betNumber = [betNumber, betNumber2]
-            betStage = betStage + 0.5
+            gameStage = gameStage + 0.5
         else:
             inputError = True
     
     # Inner bet: corner/square (a square of four board-adjacent numbers)   
-    while betStage == 2 and betType == "square":
+    while gameStage == 2 and betType == "square":
         clear()
         print("-"*5, "STEP 2: Select Numbers", "-"*86, "\n")
         if inputError == True:
@@ -180,16 +180,16 @@ while betStage >= 1:
         inputError = False
         betNumber = input("Please enter a starting number from the list above: ")
         if betNumber == "b":
-            betStage = betStage - 1
+            gameStage = gameStage - 1
         elif betNumber not in list(map(str, range(1, 33, 3))) or betNumber not in list(map(str, range(2, 33, 3))):
             inputError = True
         else:
             betNumber = list(map(str, [int(betNumber), int(betNumber) + 1, 
                                        int(betNumber) + 3, int(betNumber) + 4]))
-            betStage = betStage + 1
+            gameStage = gameStage + 1
     
     # Inner bet: street (a row of three board-adjacent numbers)  
-    while betStage == 2 and betType == "street":
+    while gameStage == 2 and betType == "street":
         clear()
         print("-"*5, "STEP 2: Select Numbers", "-"*86, "\n")
         if inputError == True:
@@ -202,15 +202,15 @@ while betStage >= 1:
         inputError = False
         betNumber = input("Please enter a starting number from the list above: ")
         if betNumber == "b":
-            betStage = betStage - 1
+            gameStage = gameStage - 1
         elif betNumber not in list(map(str, [1, 4, 7, 10, 13, 16, 19, 22, 25, 28, 31, 34])):
             inputError = True
         else:
             betNumber = list(map(str, [int(betNumber), int(betNumber) + 1, int(betNumber) + 2]))
-            betStage = betStage + 1
+            gameStage = gameStage + 1
     
     # Inner bet: double street (two consecutive rows of three board-adjacent numbers)  
-    while betStage == 2 and betType == "doublestreet":
+    while gameStage == 2 and betType == "doublestreet":
         clear()
         print("-"*5, "STEP 2: Select Numbers", "-"*86, "\n")
         if inputError == True:
@@ -223,16 +223,16 @@ while betStage >= 1:
         inputError = False
         betNumber = input("Please enter a starting number from the list above: ")
         if betNumber == "b":
-            betStage = betStage - 1
+            gameStage = gameStage - 1
         elif betNumber not in list(map(str, [1, 4, 7, 10, 13, 16, 19, 22, 25, 28, 31])):
             inputError = True
         else:
             betNumber = list(map(str, [int(betNumber), int(betNumber) + 1, int(betNumber) + 2,
                                        int(betNumber) + 3, int(betNumber) + 4, int(betNumber) + 5]))
-            betStage = betStage + 1
+            gameStage = gameStage + 1
     
     # Inner bet: trio (numbers 0, 1, 2 or 0, 2, 3)   
-    while betStage == 2 and betType == "trio":
+    while gameStage == 2 and betType == "trio":
         clear()
         print("-"*5, "STEP 2: Select Numbers", "-"*86, "\n")
         if inputError == True:
@@ -245,18 +245,18 @@ while betStage >= 1:
         inputError = False
         betNumber = input("First or second trio: ")
         if betNumber == "b":
-            betStage = betStage - 1
+            gameStage = gameStage - 1
         elif betNumber in ["First", "first", "1st", "1"]:
             betNumber = list(map(str, [0, 1, 2]))
-            betStage = betStage + 1
+            gameStage = gameStage + 1
         elif betNumber in ["Second", "second", "2nd", "2"]:
             betNumber = list(map(str, [0, 2, 3]))
-            betStage = betStage + 1
+            gameStage = gameStage + 1
         else:
             inputError = True
     
     # Inner bet: basket (numbers 0, 1, 2, 3) 
-    while betStage == 2 and betType == "basket":
+    while gameStage == 2 and betType == "basket":
         clear()
         print("-"*5, "STEP 2: Select Numbers", "-"*86, "\n")
         if inputError == True:
@@ -268,17 +268,17 @@ while betStage >= 1:
         inputError = False
         betNumber = input("Proceed? Y/N: ")
         if betNumber in ["b", "N", "n", "No", "no"]:
-            betStage = betStage - 1
+            gameStage = gameStage - 1
         elif betNumber in ["Y", "y", "Yes", "yes"]:
             betNumber = list(map(str, range(0, 4, 1)))
-            betStage = betStage + 1
+            gameStage = gameStage + 1
         else:
             inputError = True
     
     # ----- Step 2: Select Numbers (Outer Bets) -------------------------------  
     
     # Outer bet: low (numbers 1-18)
-    while betStage == 2 and betType == "low":
+    while gameStage == 2 and betType == "low":
         clear()
         print("-"*5, "STEP 2: Select Numbers", "-"*86, "\n")
         if inputError == True:
@@ -290,15 +290,15 @@ while betStage >= 1:
         inputError = False
         betNumber = input("Proceed? Y/N: ")
         if betNumber in ["b", "N", "n", "No", "no"]:
-            betStage = betStage - 1
+            gameStage = gameStage - 1
         elif betNumber in ["Y", "y", "Yes", "yes"]:
             betNumber = list(map(str, range(1, 19, 1)))
-            betStage = betStage + 1
+            gameStage = gameStage + 1
         else:
             inputError = True
     
     # Outer bet: high (numbers 19-36)  
-    while betStage == 2 and betType == "high":
+    while gameStage == 2 and betType == "high":
         clear()
         print("-"*5, "STEP 2: Select Numbers", "-"*86, "\n")
         if inputError == True:
@@ -310,15 +310,15 @@ while betStage >= 1:
         inputError = False
         betNumber = input("Proceed? Y/N: ")
         if betNumber in ["b", "N", "n", "No", "no"]:
-            betStage = betStage - 1
+            gameStage = gameStage - 1
         elif betNumber in ["Y", "y", "Yes", "yes"]:
             betNumber = list(map(str, range(19, 37, 1)))
-            betStage = betStage + 1
+            gameStage = gameStage + 1
         else:
             inputError = True
     
     # Outer bet: black
-    while betStage == 2 and betType == "black":
+    while gameStage == 2 and betType == "black":
         clear()
         print("-"*5, "STEP 2: Select Numbers", "-"*86, "\n")
         if inputError == True:
@@ -331,15 +331,15 @@ while betStage >= 1:
         inputError = False
         betNumber = input("Proceed? Y/N: ")
         if betNumber in ["b", "N", "n", "No", "no"]:
-            betStage = betStage - 1
+            gameStage = gameStage - 1
         elif betNumber in ["Y", "y", "Yes", "yes"]:
             betNumber = list(map(str, [2, 4, 6, 8, 10, 11, 13, 15, 17, 20, 22, 24, 26, 28, 29, 31, 33, 35]))
-            betStage = betStage + 1
+            gameStage = gameStage + 1
         else:
             inputError = True
     
     # Outer bet: red    
-    while betStage == 2 and betType == "red":
+    while gameStage == 2 and betType == "red":
         clear()
         print("-"*5, "STEP 2: Select Numbers", "-"*86, "\n")
         if inputError == True:
@@ -352,15 +352,15 @@ while betStage >= 1:
         inputError = False
         betNumber = input("Proceed? Y/N: ")
         if betNumber in ["b", "N", "n", "No", "no"]:
-            betStage = betStage - 1
+            gameStage = gameStage - 1
         elif betNumber in ["Y", "y", "Yes", "yes"]:
             betNumber = list(map(str, [1, 3, 5, 7, 9, 12, 14, 16, 18, 19, 21, 23, 25, 27, 30, 32, 34, 36]))
-            betStage = betStage + 1
+            gameStage = gameStage + 1
         else:
             inputError = True
     
     # Outer bet: odd    
-    while betStage == 2 and betType == "odd":
+    while gameStage == 2 and betType == "odd":
         clear()
         print("-"*5, "STEP 2: Select Numbers", "-"*86, "\n")
         if inputError == True:
@@ -372,15 +372,15 @@ while betStage >= 1:
         inputError = False
         betNumber = input("Proceed? Y/N: ")
         if betNumber in ["b", "N", "n", "No", "no"]:
-            betStage = betStage - 1
+            gameStage = gameStage - 1
         elif betNumber in ["Y", "y", "Yes", "yes"]:
             betNumber = list(map(str, range(1, 37, 2)))
-            betStage = betStage + 1
+            gameStage = gameStage + 1
         else:
             inputError = True
     
     # Outer bet: even    
-    while betStage == 2 and betType == "even":
+    while gameStage == 2 and betType == "even":
         clear()
         print("-"*5, "STEP 2: Select Numbers", "-"*86, "\n")
         if inputError == True:
@@ -392,15 +392,15 @@ while betStage >= 1:
         inputError = False
         betNumber = input("Proceed? Y/N: ")
         if betNumber in ["b", "N", "n", "No", "no"]:
-            betStage = betStage - 1
+            gameStage = gameStage - 1
         elif betNumber in ["Y", "y", "Yes", "yes"]:
             betNumber = list(map(str, range(2, 37, 2)))
-            betStage = betStage + 1
+            gameStage = gameStage + 1
         else:
             inputError = True
     
     # Outer bet: dozen    
-    while betStage == 2 and betType == "dozen":
+    while gameStage == 2 and betType == "dozen":
         clear()
         print("-"*5, "STEP 2: Select Numbers", "-"*86, "\n")
         if inputError == True:
@@ -413,21 +413,21 @@ while betStage >= 1:
         inputError = False
         betNumber = input("First, second, or third dozen: ")
         if betNumber == "b":
-            betStage = betStage - 1
+            gameStage = gameStage - 1
         elif betNumber in ["First", "first", "1st", "1"]:
             betNumber = list(map(str, range(1, 13, 1)))
-            betStage = betStage + 1
+            gameStage = gameStage + 1
         elif betNumber in ["Second", "second", "2nd", "2"]:
             betNumber = list(map(str, range(13, 25, 1)))
-            betStage = betStage + 1
+            gameStage = gameStage + 1
         elif betNumber in ["Third", "third", "3rd", "3"]:
             betNumber = list(map(str, range(25, 37, 1)))
-            betStage = betStage + 1
+            gameStage = gameStage + 1
         else:
             inputError = True
     
     # Outer bet: column       
-    while betStage == 2 and betType == "column":
+    while gameStage == 2 and betType == "column":
         clear()
         print("-"*5, "STEP 2: Select Numbers", "-"*86, "\n")
         if inputError == True:
@@ -442,21 +442,21 @@ while betStage >= 1:
         inputError = False
         betNumber = input("First, second, or third column: ")
         if betNumber == "b":
-            betStage = betStage - 1
+            gameStage = gameStage - 1
         elif betNumber in ["First", "first", "1st", "1"]:
             betNumber = list(map(str, range(1, 35, 3)))
-            betStage = betStage + 1
+            gameStage = gameStage + 1
         elif betNumber in ["Second", "second", "2nd", "2"]:
             betNumber = list(map(str, range(2, 36, 3)))
-            betStage = betStage + 1
+            gameStage = gameStage + 1
         elif betNumber in ["Third", "third", "3rd", "3"]:
             betNumber = list(map(str, range(3, 37, 3)))
-            betStage = betStage + 1
+            gameStage = gameStage + 1
         else:
             inputError = True
     
     # Outer bet: snake        
-    while betStage == 2 and betType == "snake":
+    while gameStage == 2 and betType == "snake":
         clear()
         print("-"*5, "STEP 2: Select Numbers", "-"*86, "\n")
         if inputError == True:
@@ -469,17 +469,17 @@ while betStage >= 1:
         inputError = False
         betNumber = input("Proceed? Y/N: ")
         if betNumber in ["b", "N", "n", "No", "no"]:
-            betStage = betStage - 1
+            gameStage = gameStage - 1
         elif betNumber in ["Y", "y", "Yes", "yes"]:
             betNumber = list(map(str, [1, 5, 9, 12, 14, 16, 19, 23, 27, 30, 32, 34]))
-            betStage = betStage + 1
+            gameStage = gameStage + 1
         else:
             inputError = True
     
     # ----- Step 3: Select Wager ----------------------------------------------
     
     # Choose amount to bet
-    while betStage == 3:
+    while gameStage == 3:
         clear()
         print("-"*5, "STEP 3: Select Wager", "-"*88, "\n")
         if inputError == 1:
@@ -501,7 +501,7 @@ while betStage >= 1:
         cheatMessage = 0
         betAmount = input("Please enter a whole amount to wager: ")
         if betAmount == "b":
-            betStage = betStage - 1
+            gameStage = gameStage - 1
         elif betAmount in ["Loan", "loan"]:
             if cheatL == True:
                 cheatMessage = 3
@@ -524,14 +524,14 @@ while betStage >= 1:
                 elif int(betAmount) <= 0:
                     inputError = 2
                 else:
-                    betStage = betStage + 1
+                    gameStage = gameStage + 1
             except ValueError:
                 inputError = 3
 
     # ----- Step 4: Confirm Bet -----------------------------------------------
 
     # Confirm bet
-    while betStage == 4:
+    while gameStage == 4:
         clear()
         print("-"*5, "STEP 4: Confirm Bet", "-"*89, "\n")
         if inputError == True:
@@ -545,16 +545,16 @@ while betStage >= 1:
         inputError = False
         betConfirm = input("Proceed? Y/N: ")
         if betConfirm in ["b", "N", "n", "No", "no"]:
-            betStage = betStage - 1
+            gameStage = gameStage - 1
         elif betConfirm in ["Y", "y", "Yes", "yes"]:
-            betStage = 5
+            gameStage = 5
         else:
             inputError = True
     
     # ----- Step 5: Run numbers -----------------------------------------------  
     
     # Bet outcomes and prompt to reuse bet
-    while betStage == 5:
+    while gameStage == 5:
         clear()
         print("-"*5, "STEP 5: Results", "-"*93, "\n")
         if inputError == 1:
@@ -585,12 +585,12 @@ while betStage >= 1:
         print("")
         betReuse = input("Would you like use your previous bet again? Y/N: ")
         if betReuse in ["b", "N", "n", "No", "no"]:
-            betStage = 1
+            gameStage = 1
         elif betReuse in ["Y", "y", "Yes", "yes"]:
             if balance < int(betAmount):
                 inputError = 1
             else:
-                betStage = 5
+                gameStage = 5
         else:
             inputError = 2
         
