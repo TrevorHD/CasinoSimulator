@@ -1,8 +1,6 @@
 # ----- Import packages -----------------------------------------------------------------------------------------------------
 
 # Import packages
-import pandas as pd
-import numpy as np
 import random
 
 # Define function to clear text from console
@@ -25,6 +23,7 @@ def shuffle():
     return shuffleCards
 
 # Define function to check sum of any given hand
+# Need to modify function to include aces
 def handSum(hand):
     try:
         hSum = sum(list(map(int, hand)))
@@ -33,17 +32,22 @@ def handSum(hand):
             hSum = sum(list(map(int, ["10" if x == "J" or x == "Q" or x == "K" else x for x in hand])))
     return hSum  
 
-      
-    
 # Set initial values
-balance = 1000
-betStage = 1
 inputError = False
-cheatMessage = 0
 cheatL = False
 cheatS = False
+doubled = False
+split = False
+reloopD1 = False
+reloopD2 = False
+balance = 1000
+betStage = 1
+cheatMessage = 0
 decisionNumP = 1
 decisionNumD = 1
+turnEndTypeP = "none"
+turnEndTypeD = "none"
+
 
 
 
@@ -124,76 +128,119 @@ while betStage >= 1:
     while betStage == 2:
         clear()
         print("-"*5, "STEP 2: Player Turns", "-"*88, "\n")
-        if inputError == True:
+        if inputError == 1:
+            print("Insufficient funds to double bet!", "\n")
+        elif inputError == 2:
             print("Invalid input, try again.", "\n")
         else:
             print("\n")
-        print("Dealer totals", handSum(cardDealer), "with cards: ?", cardDealer[1])
+        print("Dealer totals ? with cards: ?", cardDealer[1])
         print("Player totals", handSum(cardPlayer), "with cards:", *cardPlayer)
         print("Your current bet is", betAmount, "credits.", "\n")
         if decisionNumP == 1:
             print("You were given card(s)", *cardPlayer, "\n")
-        else:
+        elif turnEndTypeP != "stand" and turnEndTypeP != "surrender":
             print("You were given card(s)", cardPlayer[len(cardPlayer) - 1], "\n")
+        else:
+            print("\n")
         inputError = False
+        
         if handSum(cardPlayer) > 21:
-            decision = input("You busted, now it is the dealer's turn. Hit enter to continue.")
+            if doubled == False:
+                turnEndTypeP = "bust"
+            else:
+                turnEndTypeP = "doubleBust"
+        elif handSum(cardPlayer) <= 21 and doubled == True:
+            turnEndTypeP = "doubleStand"
+        
+        if turnEndTypeP == "bust":
+            decision = input("You busted; now it is the dealer's turn. Hit enter to continue. ")
+            betStage = betStage + 1
+        elif turnEndTypeP == "doubleBust":
+            decision = input("You doubled down and busted; now it is the dealer's turn. Hit enter to continue. ")
+            betStage = betStage + 1
+        elif turnEndTypeP == "stand":
+            decision = input("You stand and your turn is over; now it is the dealer's turn. Hit enter to continue. ")
+            betStage = betStage + 1
+        elif turnEndTypeP == "doubleStand":
+            decision = input("You doubled down and stand; now it is the dealer's turn. Hit enter to continue. ")
+            betStage = betStage + 1
+        elif turnEndTypeP == "surrender":
+            decision = input("You surrender and your turn is over; now it is the dealer's turn. Hit enter to continue. ")
+            betAmount = int(betAmount)*0.5
             betStage = betStage + 1
         else:
             # note: will put in option for split later
-            if(decisionNumP == 1):
+            if decisionNumP == 1:
                 decision = input("Your move. Hit, stand, double down, or surrender: ")
-            else:
+            elif decisionNumP > 1:
                 decision = input("You're still in. Hit or stand: ")
             if decision in ["Hit", "hit"]:
                 cardPlayer.append(cardQueue.pop())
+                turnEndTypeP = "hit"
             elif decision in ["Stand", "stand"]:
-                decision = input("You stand and your turn is over; now it is the dealer's turn. Hit enter to continue.")
-                betStage = betStage + 1
+                turnEndTypeP = "stand"
             elif decision in ["Double Down", "Double down", "double down", "double Down",
                               "Doubledown", "DoubleDown", "doubledown", "doubleDown"] and decisionNumP == 1:
-                betAmount = int(betAmount)*2
-                cardPlayer.append(cardQueue.pop())
-                betStage = betStage + 1
+                if balance < int(betAmount)*2:
+                    inputError = 1
+                else:
+                    doubled = True
+                    betAmount = int(betAmount)*2
+                    cardPlayer.append(cardQueue.pop())
+                turnEndTypeP = "doubleDown"
             elif decision in ["Surrender", "surrender"] and decisionNumP == 1:
-                betAmount = int(betAmount)*0.5
-                decision = input("You surrender and your turn is over; now it is the dealer's turn. Hit enter to continue.")
-                betStage = betStage + 1
+                turnEndTypeP = "surrender"
             else:
-                inputError = True
+                inputError = 2
             if inputError == False:
                 decisionNumP = decisionNumP + 1
     
     # ----- Step 3: Dealer decisions ------------------------------------------
     
-    # Dealer takes turn
     while betStage == 3:
         clear()
         print("-"*5, "STEP 3: Dealer Turns", "-"*88, "\n")
-        if inputError == True:
-            print("Invalid input, try again.", "\n")
+        print("\n")
+        print("Dealer totals", handSum(cardDealer), "with cards:", *cardDealer)
+        print("Player totals", handSum(cardPlayer), "with cards:", *cardPlayer)
+        print("Your current bet is", betAmount, "credits.", "\n")
+        if decisionNumD == 1:
+            print("\n")
+            decision = input("Dealer reveals hole card. Press enter to continue. ")
+        elif decisionNumD > 1 and (turnEndTypeD == "hit" or turnEndTypeD == "hitStand"):
+            print("Dealer was given card(s)", cardDealer[len(cardDealer) - 1], "\n")
         else:
             print("\n")
-        print("Your current bet is", betAmount)
-        if decisionNumD == 1:
-            print("Dealer was given card(s)", *cardDealer, "\n")
-        else:
-            print("Dealer was given card(s)", cardDealer[len(cardDealer) - 1], "\n")
-        print("Dealer has cards", *cardDealer, "with total of", handSum(cardDealer))
-        print("You have cards", *cardPlayer, "with total of", handSum(cardPlayer))
+        
         if handSum(cardDealer) > 21:
-            decision = input("Dealer busted. Press enter to continue.")
-            betStage = betStage + 1
+            turnEndTypeD = "bust"
         elif handSum(cardDealer) <= 16:
-            if decisionNumD == 1:
-                decision = input("Dealer reveals hole card. Press enter to continue.")
-            else:
-                cardDealer.append(cardQueue.pop())
-                decision = input("Dealer hits. Press enter to continue.")
-        else:
+            cardDealer.append(cardQueue.pop())
+            turnEndTypeD = "hit"
+            
+        if handSum(cardDealer) in range(17, 22, 1):
+            if decisionNumD > 1 and turnEndTypeD == "hit":
+                turnEndTypeD = "hitStand" 
+                reloopD1 = True
+            elif turnEndTypeD == "hitStand" and reloopD1 == True:
+                reloopD2 = True
+            elif decisionNumD > 1:
+                turnEndTypeD = "stand"
+    
+        if turnEndTypeD == "bust":
+            decision = input("Dealer hits and busts. Hit enter to continue. ")
             betStage = betStage + 1
-            decision = input("Dealer stands. Press enter to continue.")
-        decisionNumD = decisionNumD + 1
+        elif turnEndTypeD == "stand":
+            decision = input("Dealer stands. Hit enter to continue. ")
+            betStage = betStage + 1
+        elif turnEndTypeD == "hitStand" and reloopD2 == True:
+            decision = input("Dealer hits and then stands. Hit enter to continue. ")
+            betStage = betStage + 1
+        elif decisionNumD > 1 and turnEndTypeD != "hitStand":
+            decision = input("Dealer hits. Press enter to continue.")
+        if inputError == False:
+            decisionNumD = decisionNumD + 1
         
     # ----- Step 4: Results ---------------------------------------------------
     
@@ -206,30 +253,35 @@ while betStage >= 1:
         else:
             print("\n")
         if handSum(cardDealer) > 21 and handSum(cardPlayer) > 21:
-            print("Player busts, dealer busts.")
+            print("Player busts at", handSum(cardPlayer), "and dealer busts at", handSum(cardDealer))
             print("Loss of", betAmount)
             balance = balance - int(betAmount)
         elif handSum(cardDealer) > 21 and handSum(cardPlayer) <= 21:
-            print("Player wins, dealer busts.")
+            print("Player wins at", handSum(cardPlayer), "and dealer busts at", handSum(cardDealer))
             print("Payout of", betAmount)
             balance = balance + int(betAmount)
         elif handSum(cardDealer) <= 21 and handSum(cardPlayer) > 21:
-            print("Player busts, dealer wins.")
+            print("Player busts at", handSum(cardPlayer), "and dealer wins at", handSum(cardDealer))
             print("Loss of", betAmount)
             balance = balance - int(betAmount)
         elif handSum(cardDealer) <= 21 and handSum(cardPlayer) <= 21 and handSum(cardDealer) > handSum(cardPlayer):
-            print("Player loses, dealer wins.")
+            print("Player loses at", handSum(cardPlayer), "and dealer wins at", handSum(cardDealer))
             print("Loss of", betAmount)
             balance = balance - int(betAmount)
         elif handSum(cardDealer) <= 21 and handSum(cardPlayer) <= 21 and handSum(cardDealer) < handSum(cardPlayer):
-            print("Player wins, dealer loses.")
+            print("Player wins at", handSum(cardPlayer), "and dealer loses at", handSum(cardDealer))
             print("Payout of", betAmount)
             balance = balance + int(betAmount)
         elif handSum(cardDealer) <= 21 and handSum(cardPlayer) <= 21 and handSum(cardDealer) == handSum(cardPlayer):
             print("Push; bet returned to player.")
         input("Press enter to continue.")
+        turnEndTypeP = "none"
+        turnEndTypeD = "none"
+        doubled = False
         decisionNumP = 1
         decisionNumD = 1
+        reloopD1 = False
+        reloopD2 = False
         betStage = 1
         
         
