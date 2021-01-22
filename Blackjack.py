@@ -14,8 +14,8 @@ clear()
 
 # ----- Pre-run setup -------------------------------------------------------------------------------------------------------
 
-# Create a double-deck of cards; will add in aces once base code works
-deck = list(map(str, range(2, 11, 1)))*8 + ["J", "Q", "K"]*8
+# Create a double-deck of cards
+deck = list(map(str, range(2, 11, 1)))*8 + ["J", "Q", "K", "A"]*8
 
 # Define function to shuffle double-deck
 def shuffle():
@@ -23,12 +23,18 @@ def shuffle():
     return shuffleCards
 
 # Define function to check sum of any given hand
-# Need to modify function to include aces
 def handSum(hand):
     try:
         hSum = sum(list(map(int, hand)))
     except ValueError:
-        if "J" in hand or "K" in hand or "Q" in hand:
+        if "A" in hand:
+            h1 = ["10" if x == "J" or x == "Q" or x == "K" else x for x in hand]
+            h1 = ["11" if x == "A" else x for x in h1]
+            hSum = sum(list(map(int, h1)))
+            while hSum > 21 and "11" in h1:
+                h1[h1.index("11")] = "1"
+                hSum = sum(list(map(int, h1)))
+        else:
             hSum = sum(list(map(int, ["10" if x == "J" or x == "Q" or x == "K" else x for x in hand])))
     return hSum  
 
