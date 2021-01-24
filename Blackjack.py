@@ -156,10 +156,15 @@ while betStage >= 1:
                 turnEndTypeP = "bust"
             else:
                 turnEndTypeP = "doubleBust"
+        elif handSum(cardPlayer) == 21 and decisionNumP == 1:
+            turnEndTypeP = "blackjack"
         elif handSum(cardPlayer) <= 21 and doubled == True:
             turnEndTypeP = "doubleStand"
         
-        if turnEndTypeP == "bust":
+        if turnEndTypeP == "blackjack":
+            decision = input("You have a blackjack. Hit enter to continue. ")
+            betStage = betStage + 1
+        elif turnEndTypeP == "bust":
             decision = input("You busted; now it is the dealer's turn. Hit enter to continue. ")
             betStage = betStage + 1
         elif turnEndTypeP == "doubleBust":
@@ -214,18 +219,25 @@ while betStage >= 1:
         if decisionNumD == 1:
             print("\n")
             decision = input("Dealer reveals hole card. Press enter to continue. ")
+        elif turnEndTypeD == "blackjack":
+            print("\n")
+            decision = input("Dealer has a blackjack. Hit enter to continue. ")
+            betStage = betStage + 1
         elif decisionNumD > 1 and (turnEndTypeD == "hit" or turnEndTypeD == "hitStand"):
             print("Dealer was given card(s)", cardDealer[len(cardDealer) - 1], "\n")
         else:
             print("\n")
         
+        
+        if handSum(cardDealer) == 21 and decisionNumD == 1:
+            turnEndTypeD = "blackjack"
         if handSum(cardDealer) > 21:
             turnEndTypeD = "bust"
         elif handSum(cardDealer) <= 16:
             cardDealer.append(cardQueue.pop())
             turnEndTypeD = "hit"
             
-        if handSum(cardDealer) in range(17, 22, 1):
+        if handSum(cardDealer) in range(17, 22, 1) and turnEndTypeD != "blackjack":
             if decisionNumD > 1 and turnEndTypeD == "hit":
                 turnEndTypeD = "hitStand" 
                 reloopD1 = True
@@ -233,24 +245,25 @@ while betStage >= 1:
                 reloopD2 = True
             elif decisionNumD > 1:
                 turnEndTypeD = "stand"
-    
-        if turnEndTypeD == "bust":
-            decision = input("Dealer hits and busts. Hit enter to continue. ")
-            betStage = betStage + 1
-        elif turnEndTypeD == "stand":
-            decision = input("Dealer stands. Hit enter to continue. ")
-            betStage = betStage + 1
-        elif turnEndTypeD == "hitStand" and reloopD2 == True:
-            decision = input("Dealer hits and then stands. Hit enter to continue. ")
-            betStage = betStage + 1
-        elif decisionNumD > 1 and turnEndTypeD != "hitStand":
-            decision = input("Dealer hits. Press enter to continue.")
+                
+        if turnEndTypeD != "blackjack":    
+            if turnEndTypeD == "bust":
+                decision = input("Dealer hits and busts. Hit enter to continue. ")
+                betStage = betStage + 1
+            elif turnEndTypeD == "stand":
+                decision = input("Dealer stands. Hit enter to continue. ")
+                betStage = betStage + 1
+            elif turnEndTypeD == "hitStand" and reloopD2 == True:
+                decision = input("Dealer hits and then stands. Hit enter to continue. ")
+                betStage = betStage + 1
+            elif decisionNumD > 1 and turnEndTypeD != "hitStand":
+                decision = input("Dealer hits. Press enter to continue. ")
         if inputError == False:
             decisionNumD = decisionNumD + 1
         
     # ----- Step 4: Results ---------------------------------------------------
     
-    # Dealer takes turn
+    # Print appropriate result message
     while betStage == 4:
         clear()
         print("-"*5, "STEP 4: Results", "-"*93, "\n")
@@ -258,29 +271,40 @@ while betStage >= 1:
             print("Invalid input, try again.", "\n")
         else:
             print("\n")
-        if handSum(cardDealer) > 21 and handSum(cardPlayer) > 21:
-            print("Player busts at", handSum(cardPlayer), "and dealer busts at", handSum(cardDealer))
-            print("Loss of", betAmount)
+        if turnEndTypeD == "blackjack" and turnEndTypeP != "blackjack":
+            print("Dealer has blackjack; player loses.")
+            print("Loss of ", betAmount, ".", sep = "")
             balance = balance - int(betAmount)
-        elif handSum(cardDealer) > 21 and handSum(cardPlayer) <= 21:
-            print("Player wins at", handSum(cardPlayer), "and dealer busts at", handSum(cardDealer))
-            print("Payout of", betAmount)
-            balance = balance + int(betAmount)
-        elif handSum(cardDealer) <= 21 and handSum(cardPlayer) > 21:
-            print("Player busts at", handSum(cardPlayer), "and dealer wins at", handSum(cardDealer))
-            print("Loss of", betAmount)
-            balance = balance - int(betAmount)
-        elif handSum(cardDealer) <= 21 and handSum(cardPlayer) <= 21 and handSum(cardDealer) > handSum(cardPlayer):
-            print("Player loses at", handSum(cardPlayer), "and dealer wins at", handSum(cardDealer))
-            print("Loss of", betAmount)
-            balance = balance - int(betAmount)
-        elif handSum(cardDealer) <= 21 and handSum(cardPlayer) <= 21 and handSum(cardDealer) < handSum(cardPlayer):
-            print("Player wins at", handSum(cardPlayer), "and dealer loses at", handSum(cardDealer))
-            print("Payout of", betAmount)
-            balance = balance + int(betAmount)
-        elif handSum(cardDealer) <= 21 and handSum(cardPlayer) <= 21 and handSum(cardDealer) == handSum(cardPlayer):
-            print("Push; bet returned to player.")
-        input("Press enter to continue.")
+        if turnEndTypeD != "blackjack" and turnEndTypeP == "blackjack":
+            print("Player has blackjack; dealer loses.")
+            print("Payout of", 0.5*int(betAmount), ".", sep = "")
+            balance = balance + 0.5*int(betAmount)
+        if turnEndTypeD == "blackjack" and turnEndTypeP == "blackjack":
+            print("Push; Player and Dealer both have blackjack. Bet returned to player.")
+        if turnEndTypeD != "blackjack" and turnEndTypeP != "blackjack":
+            if handSum(cardDealer) > 21 and handSum(cardPlayer) > 21:
+                print("Player busts with", handSum(cardPlayer), "and dealer busts with", handSum(cardDealer), ".", sep = "")
+                print("Loss of", betAmount, ".", sep = "")
+                balance = balance - int(betAmount)
+            elif handSum(cardDealer) > 21 and handSum(cardPlayer) <= 21:
+                print("Player wins with", handSum(cardPlayer), "and dealer busts with", handSum(cardDealer), ".", sep = "")
+                print("Payout of", betAmount, ".", sep = "")
+                balance = balance + int(betAmount)
+            elif handSum(cardDealer) <= 21 and handSum(cardPlayer) > 21:
+                print("Player busts with", handSum(cardPlayer), "and dealer wins with", handSum(cardDealer), ".", sep = "")
+                print("Loss of", betAmount, ".", sep = "")
+                balance = balance - int(betAmount)
+            elif handSum(cardDealer) <= 21 and handSum(cardPlayer) <= 21 and handSum(cardDealer) > handSum(cardPlayer):
+                print("Player loses with", handSum(cardPlayer), "and dealer wins with", handSum(cardDealer), ".", sep = "")
+                print("Loss of", betAmount, ".", sep = "")
+                balance = balance - int(betAmount)
+            elif handSum(cardDealer) <= 21 and handSum(cardPlayer) <= 21 and handSum(cardDealer) < handSum(cardPlayer):
+                print("Player wins with", handSum(cardPlayer), "and dealer loses with", handSum(cardDealer), ".", sep = "")
+                print("Payout of", betAmount, ".", sep = "")
+                balance = balance + int(betAmount)
+            elif handSum(cardDealer) <= 21 and handSum(cardPlayer) <= 21 and handSum(cardDealer) == handSum(cardPlayer):
+                print("Push; Player and Dealer tie with", handSum(cardPlayer), ". Bet returned to player.", sep = "")
+        input("Press enter to continue. ")
         turnEndTypeP = "none"
         turnEndTypeD = "none"
         doubled = False
@@ -296,5 +320,5 @@ while betStage >= 1:
         
         
     # Rules: dealer must draw on 16 and stand on 17, blackjack pays 2:1, early surrender only, double down
-    #        available on soft count (even with aces) on initial hand only
+    #        available on soft count (even with aces) on initial hand only, blackjack pays 3:2
     
