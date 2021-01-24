@@ -277,33 +277,33 @@ while betStage >= 1:
             balance = balance - int(betAmount)
         if turnEndTypeD != "blackjack" and turnEndTypeP == "blackjack":
             print("Player has blackjack; dealer loses.")
-            print("Payout of", 0.5*int(betAmount), ".", sep = "")
+            print("Payout of ", 0.5*int(betAmount), ".", sep = "")
             balance = balance + 0.5*int(betAmount)
         if turnEndTypeD == "blackjack" and turnEndTypeP == "blackjack":
             print("Push; Player and Dealer both have blackjack. Bet returned to player.")
         if turnEndTypeD != "blackjack" and turnEndTypeP != "blackjack":
             if handSum(cardDealer) > 21 and handSum(cardPlayer) > 21:
-                print("Player busts with", handSum(cardPlayer), "and dealer busts with", handSum(cardDealer), ".", sep = "")
-                print("Loss of", betAmount, ".", sep = "")
+                print("Player busts with ", handSum(cardPlayer), "and dealer busts with ", handSum(cardDealer), ".", sep = "")
+                print("Loss of ", betAmount, ".", sep = "")
                 balance = balance - int(betAmount)
             elif handSum(cardDealer) > 21 and handSum(cardPlayer) <= 21:
-                print("Player wins with", handSum(cardPlayer), "and dealer busts with", handSum(cardDealer), ".", sep = "")
-                print("Payout of", betAmount, ".", sep = "")
+                print("Player wins with ", handSum(cardPlayer), "and dealer busts with ", handSum(cardDealer), ".", sep = "")
+                print("Payout of ", betAmount, ".", sep = "")
                 balance = balance + int(betAmount)
             elif handSum(cardDealer) <= 21 and handSum(cardPlayer) > 21:
-                print("Player busts with", handSum(cardPlayer), "and dealer wins with", handSum(cardDealer), ".", sep = "")
-                print("Loss of", betAmount, ".", sep = "")
+                print("Player busts with ", handSum(cardPlayer), "and dealer wins with ", handSum(cardDealer), ".", sep = "")
+                print("Loss of ", betAmount, ".", sep = "")
                 balance = balance - int(betAmount)
             elif handSum(cardDealer) <= 21 and handSum(cardPlayer) <= 21 and handSum(cardDealer) > handSum(cardPlayer):
-                print("Player loses with", handSum(cardPlayer), "and dealer wins with", handSum(cardDealer), ".", sep = "")
-                print("Loss of", betAmount, ".", sep = "")
+                print("Player loses with ", handSum(cardPlayer), "and dealer wins with ", handSum(cardDealer), ".", sep = "")
+                print("Loss of ", betAmount, ".", sep = "")
                 balance = balance - int(betAmount)
             elif handSum(cardDealer) <= 21 and handSum(cardPlayer) <= 21 and handSum(cardDealer) < handSum(cardPlayer):
-                print("Player wins with", handSum(cardPlayer), "and dealer loses with", handSum(cardDealer), ".", sep = "")
-                print("Payout of", betAmount, ".", sep = "")
+                print("Player wins with ", handSum(cardPlayer), "and dealer loses with ", handSum(cardDealer), ".", sep = "")
+                print("Payout of ", betAmount, ".", sep = "")
                 balance = balance + int(betAmount)
             elif handSum(cardDealer) <= 21 and handSum(cardPlayer) <= 21 and handSum(cardDealer) == handSum(cardPlayer):
-                print("Push; Player and Dealer tie with", handSum(cardPlayer), ". Bet returned to player.", sep = "")
+                print("Push; Player and Dealer tie with ", handSum(cardPlayer), ". Bet returned to player.", sep = "")
         input("Press enter to continue. ")
         turnEndTypeP = "none"
         turnEndTypeD = "none"
