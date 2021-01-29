@@ -2,11 +2,7 @@
 
 # Import packages
 import random
-
-# Define function to clear text from console
 import os
-def clear(): os.system('cls') #on Windows System
-clear()
 
 
 
@@ -16,6 +12,10 @@ clear()
 
 # Create a double-deck of cards
 deck = list(map(str, range(2, 11, 1)))*8 + ["J", "Q", "K", "A"]*8
+
+# Define function to clear text from console; confirmed to work on Windows
+def clear(): os.system('cls')
+clear()
 
 # Define function to shuffle double-deck
 def shuffle():
@@ -36,27 +36,59 @@ def handSum(hand):
                 hSum = sum(list(map(int, h1)))
         else:
             hSum = sum(list(map(int, ["10" if x == "J" or x == "Q" or x == "K" else x for x in hand])))
-    return hSum  
+    return hSum
+
+# Define function to return a specific error/cheat message for using information in global environment
+def gameMessage():
+    if inputError == 1:
+        print("Invalid input, try again.", "\n")
+    elif inputError == 2:
+        print("Please enter a number greater than zero.", "\n")
+    elif inputError == 3:
+        print("You do not have enough credits. Please enter a smaller amount.", "\n")
+    elif inputError == 4:
+        print("Insufficient funds to double bet!", "\n")
+    elif inputError == 5:
+        print("Insurance bet should be less than or equal to half of current bet, try again.", "\n")
+    elif inputError == 6:
+        print("Insufficient funds for desired insurance bet, try again.", "\n")
+    elif inputCheat == 1:
+        print("2000 credits added to your balance. Gambling on credit seems a bit irresponsible, no?", "\n")
+    elif inputCheat == 2:
+        print("1000 credits added to your balance. Who needs savings anyway?", "\n")
+    elif inputCheat == 3:
+        print("You've already used this cheat code!", "\n")
+    else:
+        print("\n")
+
+# Define function to state your outstanding balance and bet        
+def balanceBet():
+    try:
+        if int(insuranceAmount) > 0 and inputError not in [1, 2, 5, 6]:
+            print("Your balance is", balance, "credits, with a bet of", betAmount, "plus", insuranceAmount, "in insurance.", "\n")
+        else:
+            print("Your balance is ", balance, " credits, with a bet of ", betAmount, ".", "\n", sep = "")
+    except ValueError:
+        print("Your balance is ", balance, " credits, with a bet of ", betAmount, ".", "\n", sep = "")
 
 # Set initial values
-inputError = False
-cheatL = False
-cheatS = False
 doubled = False
 split = False
 dbjYes = False
 dbjCheck = False
 reloopD1 = False
 reloopD2 = False
+inputError = 0
+inputCheat = 0
 balance = 1000
 betAmount = 0
 insuranceAmount = 0
 betStage = 1
 dbjCheckStage = 1
 dbjInsuranceStage = 0
-cheatMessage = 0
 decisionNumP = 1
 decisionNumD = 1
+cheatUsed = ""
 turnEndTypeP = "none"
 turnEndTypeD = "none"
 
@@ -75,51 +107,38 @@ while betStage >= 1:
     while betStage == 1:
         clear()
         print("-"*5, "STEP 1: Select Wager", "-"*88, "\n")
-        if inputError == 1:
-            print("You do not have enough credits. Please enter a smaller amount.", "\n")
-        elif inputError == 2:
-            print("Please enter a number greater than zero.", "\n")
-        elif inputError == 3:
-            print("Invalid input, try again.", "\n")
-        elif cheatMessage == 1:
-            print("2000 credits added to your balance. Gambling on credit seems a bit irresponsible, no?", "\n")
-        elif cheatMessage == 2:
-            print("1000 credits added to your balance. Who needs savings anyway?", "\n")
-        elif cheatMessage == 3:
-            print("You've already used this cheat code!", "\n")
-        else:
-            print("\n")
+        gameMessage()
         print("You have", balance, "credits remaining in your account.")
-        inputError = False
-        cheatMessage = 0
+        inputError = 0
+        inputCheat = 0
         betAmount = input("Please enter a whole amount to wager: ")
         if betAmount == "b":
             betStage = betStage - 1
         elif betAmount in ["Loan", "loan"]:
-            if cheatL == True:
-                cheatMessage = 3
-            else:
+            if cheatUsed in ["", "s"]:
                 balance = balance + 2000
-                cheatMessage = 1
-                cheatL = True
+                inputCheat = 1
+                cheatUsed = cheatUsed + "l"
+            else:
+                inputCheat = 3
         elif betAmount in ["Savings Account", "Savings account", "savings account", "savings Account", 
                            "SavingsAccount", "Savingsaccount", "savingsaccount", "savingsAccount"]:
-            if cheatS == True:
-                cheatMessage = 3
-            else:
+            if cheatUsed in ["", "l"]:
                 balance = balance + 1000
-                cheatMessage = 2
-                cheatS = True
+                inputCheat = 2
+                cheatUsed = cheatUsed + "s"
+            else:
+                inputCheat = 3
         else:
             try:
                 if int(betAmount) > balance:
-                    inputError = 1
+                    inputError = 3
                 elif int(betAmount) <= 0:
                     inputError = 2
                 else:
                     betStage = betStage + 0.5
             except ValueError:
-                inputError = 3
+                inputError = 1
       
     # ----- Step 1.5: Initial dealing -----------------------------------------
     
@@ -132,7 +151,7 @@ while betStage >= 1:
         cardPlayer.append(cardQueue.pop())
         cardDealer.append(cardQueue.pop())
         cardPlayer.append(cardQueue.pop())
-        cardDealer = ["9", "A"]  # just for testing different scenarios
+        #cardDealer = ["9", "A"]  # just for testing different scenarios
         #cardDealer = ["Q", "A"]  # just for testing different scenarios
         if handSum(cardDealer) == 21:
             dbjYes = True
@@ -148,37 +167,19 @@ while betStage >= 1:
     while betStage == 2:
         clear()
         print("-"*5, "STEP 2: Player Turns", "-"*88, "\n")
-        if inputError == 1:
-            print("Insufficient funds to double bet!", "\n")
-        elif inputError == 2:
-            print("Invalid input, try again.", "\n")
-        elif inputError == 3:
-           print("Insurance bet should be less than or equal to half of current bet, try again.", "\n")
-        elif inputError == 4:
-           print("Please enter a number greater than zero.", "\n")
-        elif inputError == 5:
-           print("Insufficient funds for desired insurance bet, try again.", "\n")
-        else:
-            print("\n")
+        gameMessage()
         print("Dealer totals ? with cards: ?", cardDealer[1])
         print("Player totals", handSum(cardPlayer), "with cards:", *cardPlayer)
-        # Can the next 7 lines be made more efficient?
-        try:
-            if int(insuranceAmount) > 0 and inputError not in [2, 3, 4, 5]:
-                print("Your balance is", balance, "credits, with a bet of", betAmount, "plus", insuranceAmount, "in insurance.", "\n")
-            else:
-                print("Your balance is ", balance, " credits, with a bet of ", betAmount, ".", "\n", sep = "")
-        except ValueError:
-            print("Your balance is ", balance, " credits, with a bet of ", betAmount, ".", "\n", sep = "")
+        balanceBet()
         if decisionNumP == 1:
             print("You were given card(s)", *cardPlayer, "\n")
         elif turnEndTypeP != "stand" and turnEndTypeP != "surrender":
             print("You were given card(s)", cardPlayer[len(cardPlayer) - 1], "\n")
         else:
             print("\n")
-        inputError = False
+        inputError = 0
         
-        #insurance bet dialogue
+        # Insurance bet messages (if applicable)
         if dbjInsuranceStage == 1:
             decision = input("The dealer may possibly have blackjack. Place insurance bet? Y/N: ")
             if decision in ["N", "n", "No", "no"]:
@@ -188,24 +189,24 @@ while betStage >= 1:
             elif decision in ["Y", "y", "Yes", "yes"]:
                 dbjInsuranceStage = 2
             else:
-                inputError = 2
+                inputError = 1
         elif dbjInsuranceStage == 2:
             insuranceAmount = input("Enter an amount less than or equal to half yout current bet: ")  
             dbjCheckStage = 1.5
             try:
                 if int(insuranceAmount) > 0.5*int(betAmount):
-                    inputError = 3
-                elif int(insuranceAmount) <= 0:
-                    inputError = 4
-                elif int(insuranceAmount) > balance - int(betAmount):
                     inputError = 5
+                elif int(insuranceAmount) <= 0:
+                    inputError = 2
+                elif int(insuranceAmount) > balance - int(betAmount):
+                    inputError = 6
                 else:
                     dbjInsuranceStage = 0
                     dbjCheckStage = 1.75
             except ValueError:
-                inputError = 2
+                inputError = 1
                     
-        #display blackjack-checking messages
+        # Display dealer blackjack-checking messages before player turn
         if dbjCheck == True and dbjInsuranceStage == 0:
             if dbjCheckStage in [1, 2]:
                 decision = input("The dealer checks the hole card for blackjack. Hit enter to continue... ")
@@ -231,7 +232,7 @@ while betStage >= 1:
                 dbjCheckStage = 4
                 dbjCheck = False
             
-        
+        # Check player hand for bust or blackjack
         if dbjCheck == False and dbjCheckStage not in [2, 3, 3.5]:
             if handSum(cardPlayer) > 21:
                 if doubled == False:
@@ -243,6 +244,7 @@ while betStage >= 1:
             elif handSum(cardPlayer) <= 21 and doubled == True:
                 turnEndTypeP = "doubleStand"
         
+        # End-of-turn messages for player
         if dbjCheck == False and dbjCheckStage not in [2, 3, 3.5]:
             if turnEndTypeP == "blackjack":
                 decision = input("You have blackjack. Hit enter to continue... ")
@@ -277,7 +279,7 @@ while betStage >= 1:
                 elif decision in ["Double Down", "Double down", "double down", "double Down",
                                   "Doubledown", "DoubleDown", "doubledown", "doubleDown"] and decisionNumP == 1:
                     if balance < int(betAmount)*2:
-                        inputError = 1
+                        inputError = 4
                     else:
                         doubled = True
                         betAmount = int(betAmount)*2
@@ -286,8 +288,8 @@ while betStage >= 1:
                 elif decision in ["Surrender", "surrender"] and decisionNumP == 1:
                     turnEndTypeP = "surrender"
                 else:
-                    inputError = 2
-                if inputError == False:
+                    inputError = 1
+                if inputError == 0:
                     decisionNumP = decisionNumP + 1
                     
         if dbjCheck == False and dbjCheckStage == 3:
@@ -301,14 +303,7 @@ while betStage >= 1:
         print("\n")
         print("Dealer totals", handSum(cardDealer), "with cards:", *cardDealer)
         print("Player totals", handSum(cardPlayer), "with cards:", *cardPlayer)
-        # Can the next 7 lines be made more efficient?
-        try:
-            if int(insuranceAmount) > 0 and inputError not in [2, 3, 4, 5]:
-                print("Your balance is", balance, "credits, with a bet of", betAmount, "plus", insuranceAmount, "in insurance.", "\n")
-            else:
-                print("Your balance is ", balance, " credits, with a bet of ", betAmount, ".", "\n", sep = "")
-        except ValueError:
-            print("Your balance is ", balance, " credits, with a bet of ", betAmount, ".", "\n", sep = "")
+        balanceBet()
         if decisionNumD == 1:
             print("\n")
             decision = input("Dealer reveals hole card. Press enter to continue... ")
@@ -350,7 +345,7 @@ while betStage >= 1:
                 betStage = betStage + 1
             elif decisionNumD > 1 and turnEndTypeD != "hitStand":
                 decision = input("Dealer hits. Press enter to continue... ")
-        if inputError == False:
+        if inputError == 0:
             decisionNumD = decisionNumD + 1
         
     # ----- Step 4: Results ---------------------------------------------------
@@ -358,11 +353,7 @@ while betStage >= 1:
     # Print appropriate result message
     while betStage == 4:
         clear()
-        print("-"*5, "STEP 4: Results", "-"*93, "\n")
-        if inputError == True:
-            print("Invalid input, try again.", "\n")
-        else:
-            print("\n")
+        print("\n")
         if turnEndTypeD == "blackjack" and turnEndTypeP != "blackjack":
             if int(insuranceAmount) > 0:
                 print("Dealer has blackjack; player loses, but collects insurance.")
