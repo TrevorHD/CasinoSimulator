@@ -4,11 +4,7 @@
 import pandas as pd
 import numpy as np
 import random
-
-# Define function to clear text from console
 import os
-def clear(): os.system('cls') #on Windows System
-clear()
 
 
 
@@ -36,6 +32,10 @@ df = pd.DataFrame(data = np.array([["36:1",     "35:1",  35],
                   index = ["single", "split", "square", "street", "doublestreet", "trio", "basket",
                            "low", "high", "black", "red", "odd", "even", "dozen", "column", "snake"],
                   columns = ["odds", "payout", "multiplier"])
+
+# Define function to clear text from console; confirmed to work on Windows
+def clear(): os.system('cls')
+clear()
 
 # Set initial values
 balance = 1000
@@ -115,7 +115,7 @@ while gameStage >= 1:
         print("Split bets involve betting on any 2 numbers that are adjacent on the board.")
         print("Odds", df.loc[betType]["odds"], "against winning; payout", df.loc[betType]["payout"], "if successful.", "\n")
         inputError = False
-        betNumber = input("Please enter a number in between 0 and 36: ")
+        betNumber = input("Please enter a number between 0 and 36: ")
         if betNumber == "b":
             gameStage = gameStage - 1
         elif betNumber == "0":
@@ -482,6 +482,8 @@ while gameStage >= 1:
     while gameStage == 3:
         clear()
         print("-"*5, "STEP 3: Select Wager", "-"*88, "\n")
+        
+        # Display error messages
         if inputError == 1:
             print("You do not have enough credits. Please enter a smaller amount.", "\n")
         elif inputError == 2:
@@ -496,6 +498,8 @@ while gameStage >= 1:
             print("You've already used this cheat code!", "\n")
         else:
             print("\n")
+            
+        # Betting prompt
         print("You have", balance, "credits remaining in your account.")
         inputError = False
         cheatMessage = 0
@@ -557,6 +561,8 @@ while gameStage >= 1:
     while gameStage == 5:
         clear()
         print("-"*5, "STEP 5: Results", "-"*93, "\n")
+        
+        # Print outcomes
         if inputError == 1:
             print("Insufficient funds to reuse previous bet. You might want to go home...", "\n")
             print("Winning number:", *winningNumber)
@@ -583,6 +589,8 @@ while gameStage >= 1:
                 print(balanceText)
         inputError = False
         print("")
+        
+        # Prompt to reuse previous bet
         betReuse = input("Would you like use your previous bet again? Y/N: ")
         if betReuse in ["b", "N", "n", "No", "no"]:
             gameStage = 1
