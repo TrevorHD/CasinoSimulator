@@ -96,6 +96,7 @@ dbjConfirmed = False
 dbjCheck = False
 reloopD1 = False
 reloopD2 = False
+reloopD3 = False
 inputError = 0
 inputCheat = 0
 balance = 1000
@@ -337,7 +338,7 @@ while gameStage >= 1:
             print("\n")
             decision = input("Dealer has blackjack. Hit enter to continue... ")
             gameStage = gameStage + 1
-        elif decisionNumD > 1 and (turnEndTypeD == "hit" or turnEndTypeD == "hitStand"):
+        elif decisionNumD > 1 and (turnEndTypeD == "hit" or turnEndTypeD == "hitStand" or turnEndTypeD == "hitStandFirst"):
             print("Dealer was given card(s)", cardDealer[len(cardDealer) - 1], "\n")
         else:
             print("\n")
@@ -353,11 +354,17 @@ while gameStage >= 1:
         
         # Decide if dealer should hit or stand
         if handSum(cardDealer) in range(17, 22, 1) and turnEndTypeD != "blackjack":
-            if decisionNumD > 1 and turnEndTypeD == "hit":
+            if decisionNumD == 1 and turnEndTypeD == "hit":
+                turnEndTypeD = "hitStandFirst"
+                reloopD1 = True
+            elif decisionNumD > 1 and turnEndTypeD == "hit":
                 turnEndTypeD = "hitStand" 
                 reloopD1 = True
-            elif turnEndTypeD == "hitStand" and reloopD1 == True:
+            elif (turnEndTypeD == "hitStand" or turnEndTypeD == "hitStandFirst") and reloopD1 == True:
+                reloopD1 = False
                 reloopD2 = True
+            elif turnEndTypeD == "hitStand" and reloopD2 == True:
+                reloopD3 = True
             elif decisionNumD > 1:
                 turnEndTypeD = "stand"
         
@@ -369,10 +376,13 @@ while gameStage >= 1:
             elif turnEndTypeD == "stand":
                 decision = input("Dealer stands. Hit enter to continue... ")
                 gameStage = gameStage + 1
-            elif turnEndTypeD == "hitStand" and reloopD2 == True:
+            elif turnEndTypeD == "hitStandFirst" and reloopD2 == True:
                 decision = input("Dealer hits and then stands. Hit enter to continue... ")
                 gameStage = gameStage + 1
-            elif decisionNumD > 1 and turnEndTypeD != "hitStand":
+            elif turnEndTypeD == "hitStand" and reloopD3 == True:
+                decision = input("Dealer hits and then stands. Hit enter to continue... ")
+                gameStage = gameStage + 1
+            elif decisionNumD > 1 and turnEndTypeD != "hitStandFirst" and (turnEndTypeD != "hitStand" or (turnEndTypeD == "hitStand" and reloopD1 == True)):
                 decision = input("Dealer hits. Press enter to continue... ")
         if inputError == 0:
             decisionNumD = decisionNumD + 1
@@ -388,23 +398,23 @@ while gameStage >= 1:
         if turnEndTypeD == "blackjack" and turnEndTypeP != "blackjack":
             if int(insuranceAmount) > 0:
                 print("Dealer has blackjack; player loses, but collects insurance.")
-                print("Loss of ", betAmount, ", but ", insuranceAmount, " collected from insurance.", "\n", sep = "")
+                print("Loss of ", betAmount, ", but ", insuranceAmount, " collected from insurance.", sep = "")
                 balance = balance - int(betAmount) + int(insuranceAmount)
-                print("Your balance is now", balance, "credits.", "\n", "\n")
+                print("Your balance is now", balance, "credits.", "\n", "\n", "\n")
             else:
                 print("Dealer has blackjack; player loses.")
-                print("Loss of ", betAmount, ".", "\n", sep = "")
+                print("Loss of ", betAmount, ".", sep = "")
                 balance = balance - int(betAmount)
-                print("Your balance is now", balance, "credits.", "\n", "\n")
+                print("Your balance is now", balance, "credits.", "\n", "\n", "\n")
         elif turnEndTypeD != "blackjack" and turnEndTypeP == "blackjack":
             print("Player has blackjack; dealer loses.")
             print("Payout of ", 0.5*int(betAmount), ".", sep = "")
             balance = balance + 0.5*int(betAmount)
-            print("Your balance is now", balance, "credits.", "\n", "\n")
+            print("Your balance is now", balance, "credits.", "\n", "\n", "\n")
         elif turnEndTypeD == "blackjack" and turnEndTypeP == "blackjack":
             print("Player and Dealer both have blackjack.")
-            print("Push; bet refunded to player.", "\n")
-            print("Your balance is now", balance, "credits.", "\n", "\n")
+            print("Push; bet refunded to player.")
+            print("Your balance is now", balance, "credits.", "\n", "\n", "\n")
         
         # Messages for instances where the player or dealer does not have blackjack
         if turnEndTypeD != "blackjack" and turnEndTypeP != "blackjack":
@@ -435,6 +445,7 @@ while gameStage >= 1:
         decisionNumD = 1
         reloopD1 = False
         reloopD2 = False
+        reloopD3 = False
         gameStage = 1
         dbjCheckStage = 1
         dbjCheck = False
