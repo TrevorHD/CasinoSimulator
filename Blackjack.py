@@ -42,6 +42,10 @@ def handSum(hand):
 def draw(types):
     if types == "player":
         cardPlayer.append(cardQueue.pop())
+    if types == "player1":
+        cardPlayer1.append(cardQueue.pop())
+    if types == "player2":
+        cardPlayer2.append(cardQueue.pop())
     if types == "dealer":
         cardDealer.append(cardQueue.pop())
 
@@ -109,7 +113,11 @@ decisionNumP = 1
 decisionNumD = 1
 cheatUsed = ""
 turnEndTypeP = "none"
+turnEndTypeP1 = "none"
+turnEndTypeP2 = "none"
 turnEndTypeD = "none"
+splitHandToggle = 1
+splitHandToggleOff = False
 
 
 
@@ -295,9 +303,10 @@ while gameStage >= 1:
                 betAmount = int(betAmount)*0.5
                 gameStage = gameStage + 1
             else:
-                # note: will put in option for split later
                 if decisionNumP == 1:
                     decision = input("Your move. Hit, stand, double down, or surrender: ")
+                elif decisionNumP == 1 and cardPlayer[1] == cardPlayer[2]:
+                    decision = input("Your move. Hit, stand, double down, split, or surrender: ")
                 elif decisionNumP > 1:
                     decision = input("You're still in. Hit or stand: ")
                 if decision in ["Hit", "hit"]:
@@ -316,6 +325,11 @@ while gameStage >= 1:
                     turnEndTypeP = "doubleDown"
                 elif decision in ["Surrender", "surrender"] and decisionNumP == 1:
                     turnEndTypeP = "surrender"
+                elif decision in ["Split", "split"] and decisionNumP == 1 and cardPlayer[1] == cardPlayer[2]:
+                    split = True
+                    cardPlayer1 = cardPlayer[1]
+                    cardPlayer2 = cardPlayer[2]
+                    gameStage = gameStage + 0.5
                 else:
                     inputError = 1
                 if inputError == 0:
@@ -324,7 +338,92 @@ while gameStage >= 1:
         # If checking for dealer blackjack, advance to next step of this process
         if dbjCheck == False and dbjCheckStage == 3:
             dbjCheckStage = dbjCheckStage + 1
+    
+    # ----- Step 2.5: Player decisions for split ------------------------------     
+    
+    # Allow player to take turn
+    while gameStage == 2.5:
+        clear()
+        print("-"*5, "STEP 2: Player Turns", "-"*88, "\n")
+        
+        # Print initial messages and information
+        gameMessage()
+        print("Dealer totals ? with cards: ?", cardDealer[1])
+        print("Player totals", handSum(cardPlayer1), "with cards:", *cardPlayer1)
+        print("Player totals", handSum(cardPlayer2), "with cards:", *cardPlayer2)
+        balanceBet()
+        if decisionNumP == 1:
+            print("You were dealt card(s)", *cardPlayer, "\n")
+        elif turnEndTypeP != "stand" and turnEndTypeP != "surrender":
+            print("You were dealt card(s)", cardPlayer[len(cardPlayer) - 1], "\n")
+        else:
+            print("\n")
+        inputError = 0
+        
+        # Check player hand for bust
+        if handSum(cardPlayer1) > 21:
+            turnEndTypeP1 = "bust"
+        if handSum(cardPlayer2) > 21:
+            turnEndTypeP2 = "bust"
+        
+        # End-of-turn messages for player hand 2 and decision for hand 1
+        if splitHandToggle == 1:
+            if turnEndTypeP1 not in ["bust", "stand"] and turnEndTypeP2 == "bust":
+                decision = input("Your second hand busts. Hit enter to continue... ")
+                splitHandToggle = 1
+                splitHandToggleOff == True
+            if turnEndTypeP1 not in ["bust", "stand"] and turnEndTypeP2 == "stand":
+                decision = input("You stand on your second hand. Hit enter to continue... ")
+                splitHandToggle = 1
+                splitHandToggleOff == True
+            if turnEndTypeP1 in ["bust", "stand"] and turnEndTypeP2 == "bust":
+                decision = input("Your last remaining hand busts; now it is the dealer's turn. Hit enter to continue... ")
+                gameStage = gameStage + 1
+            if turnEndTypeP1 in ["bust", "stand"] and turnEndTypeP2 == "stand":
+                decision = input("You stand on your last remaining hand; now it is the dealer's turn. Hit enter to continue... ")
+                gameStage = gameStage + 1
+            decision = input("Your first hand is active. Hit or stand: ")
+            if decision in ["Hit", "hit"]:
+                draw("player1")
+                turnEndTypeP1 = "hit"
+            elif decision in ["Stand", "stand"]:
+                turnEndTypeP1 = "stand"
+            else:
+                inputError = 1
             
+        # End-of-turn messages for player hand 1 and decision for hand 2  
+        if splitHandToggle == 2:
+            if turnEndTypeP1 == "bust" and turnEndTypeP2 not in ["bust", "stand"]:
+                decision = input("Your first hand busts. Hit enter to continue... ")
+                splitHandToggle = 2
+                splitHandToggleOff == True
+            if turnEndTypeP1 == "stand" and turnEndTypeP2 not in ["bust", "stand"]:
+                decision = input("You stand on your first hand. Hit enter to continue... ")
+                splitHandToggle = 2
+                splitHandToggleOff == True
+            if turnEndTypeP1 == "bust" and turnEndTypeP2 in ["bust", "stand"]:
+                decision = input("Your last remaining hand busts; now it is the dealer's turn. Hit enter to continue... ")
+                gameStage = gameStage + 1
+            if turnEndTypeP1 == "stand" and turnEndTypeP2 in ["bust", "stand"]:
+                decision = input("You stand on your last remaining hand; now it is the dealer's turn. Hit enter to continue... ")
+                gameStage = gameStage + 1
+            decision = input("Your second hand is active. Hit or stand: ")
+            if decision in ["Hit", "hit"]:
+                draw("player2")
+                turnEndTypeP2 = "hit"
+            elif decision in ["Stand", "stand"]:
+                turnEndTypeP2 = "stand"
+            else:
+                inputError = 1
+        
+        if inputError == 0:
+            if splitHandToggleOff == False:
+                if splitHandToggle == 1:
+                    splitHandToggle = 2
+                elif splitHandToggle == 2:
+                    splitHandToggle = 1
+            decisionNumP = decisionNumP + 1
+        
     # ----- Step 3: Dealer decisions ------------------------------------------
     
     while gameStage == 3:
@@ -450,6 +549,7 @@ while gameStage >= 1:
         turnEndTypeP = "none"
         turnEndTypeD = "none"
         doubled = False
+        split = False
         decisionNumP = 1
         decisionNumD = 1
         reloopD1 = False
@@ -460,6 +560,8 @@ while gameStage >= 1:
         dbjCheck = False
         dbjInsuranceStage = 0
         dbjConfirmed = False
+        splitHandToggle = 1
+        splitHandToggleOff = False
         
         
         
