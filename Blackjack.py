@@ -213,12 +213,12 @@ while gameStage >= 1:
         
         # Shuffle cards; deal to player and dealer
         cardQueue = shuffle()
-        cardDealer = ["5", "9"]
-        cardPlayer = ["8", "8"]          
-#        draw("dealer")
-#        draw("player")
-#        draw("dealer")
-#        draw("player")
+        cardDealer = []
+        cardPlayer = []          
+        draw("dealer")
+        draw("player")
+        draw("dealer")
+        draw("player")
         
         # Check for dealer blackjack
         if handSum(cardDealer) == 21:
@@ -559,12 +559,12 @@ while gameStage >= 1:
         # Messages for instances where the player or dealer has blackjack
         if turnEndTypeD == "blackjack" and turnEndTypeP != "blackjack":
             if int(insuranceAmount) > 0:
-                print("Dealer has blackjack; player loses, but collects insurance.")
+                print("Dealer has blackjack; Player loses, but collects insurance.")
                 print("Loss of ", betAmount, ", but ", insuranceAmount, " collected from insurance.", sep = "")
                 balance = balance - int(betAmount) + int(insuranceAmount)
                 print("Your balance is now", balance, "credits.", "\n", "\n", "\n")
             else:
-                print("Dealer has blackjack; player loses.")
+                print("Dealer has blackjack; Player loses.")
                 print("Loss of ", betAmount, ".", sep = "")
                 balance = balance - int(betAmount)
                 print("Your balance is now", balance, "credits.", "\n", "\n", "\n")
@@ -581,7 +581,12 @@ while gameStage >= 1:
         # Messages for instances where the player or dealer does not have blackjack
         if split == False:
             if turnEndTypeD != "blackjack" and turnEndTypeP != "blackjack":
-                if handSum(cardDealer) > 21 and handSum(cardPlayer) > 21:
+                if turnEndTypeP == "surrender":
+                    print("Player surrenders; Dealer wins.")
+                    print("Loss of ", int(betAmount), " credits from forfeited bet.", sep = "")
+                    balance = balance - int(betAmount)
+                    print("Your balance is now", balance, "credits.", "\n", "\n", "\n")
+                elif handSum(cardDealer) > 21 and handSum(cardPlayer) > 21:
                     balance = balance - int(betAmount)
                     endMessage("busts", "busts", "Loss")
                 elif handSum(cardDealer) > 21 and handSum(cardPlayer) <= 21:
