@@ -63,6 +63,8 @@ def gameMessage():
         print("Insurance bet should be less than or equal to half of current bet, try again.", "\n")
     elif inputError == 6:
         print("Insufficient funds for desired insurance bet, try again.", "\n")
+    elif inputError == 7:
+        print("Insufficient funds to split bet!", "\n")
     elif inputCheat == 1:
         print("2000 credits added to your balance. Gambling on credit seems a bit irresponsible, no?", "\n")
     elif inputCheat == 2:
@@ -74,7 +76,7 @@ def gameMessage():
 
 # Define function to return win/loss message when neither player has blackjack
 def endMessage(playerVerb, dealerVerb, scoreNoun, tie = False):
-    if tie == True :
+    if tie == True:
         print("Player and Dealer tie with ", handSum(cardPlayer), ".", sep = "")
         print("Push; bet refunded to player.")
     elif tie == False:
@@ -82,7 +84,35 @@ def endMessage(playerVerb, dealerVerb, scoreNoun, tie = False):
               " and dealer ", dealerVerb, " with ", handSum(cardDealer), ".", sep = "")
         print(scoreNoun, "of", betAmount, "credits.")
     print("Your balance is now", balance, "credits.", "\n", "\n", "\n")
-
+    
+def endMessageSplit(playerVerb1, playerVerb2, dealerVerb1, dealerVerb2, scoreNoun, 
+                    tie1 = False, tie2 = False, wash = False):
+    if tie1 == False and tie2 == False:
+        print("Player first hand ", playerVerb1, " with ", handSum(cardPlayer1),
+              " and dealer ", dealerVerb1, " with ", handSum(cardDealer), ".", sep = "")
+        print("Player second hand ", playerVerb2, " with ", handSum(cardPlayer2),
+              " and dealer ", dealerVerb2, " with ", handSum(cardDealer), ".", sep = "")
+    if tie1 == True and tie2 == False:
+        print("Player first hand ties dealer with ", handSum(cardPlayer1), ".", sep = "")
+        print("Player second hand ", playerVerb2, " with ", handSum(cardPlayer2),
+              " and dealer ", dealerVerb2, " with ", handSum(cardDealer), ".", sep = "")
+    if tie1 == False and tie2 == True:
+        print("Player first hand ", playerVerb1, " with ", handSum(cardPlayer1),
+              " and dealer ", dealerVerb1, " with ", handSum(cardDealer), ".", sep = "")
+        print("Player second hand ties dealer with ", handSum(cardPlayer2), ".", sep = "")
+    elif tie1 == True and tie2 == True:
+        print("Player first hand ties dealer with ", handSum(cardPlayer1), ".", sep = "")
+        print("Player second hand ties dealer with ", handSum(cardPlayer2), ".", sep = "")
+    if wash == True:
+        if tie1 == True and tie2 == True:
+            print("Push; bet refunded to player.")
+        else:
+            print("No gain or loss of credits.")
+            print("Your balance is still", balance, "credits.", "\n", "\n", "\n")
+    else:
+        print(scoreNoun, "of", betAmount, "credits.")
+        print("Your balance is now", balance, "credits.", "\n", "\n", "\n")
+        
 # Define function to state your outstanding balance and bet        
 def balanceBet():
     try:
@@ -93,31 +123,38 @@ def balanceBet():
     except ValueError:
         print("Your balance is ", balance, " credits, with a bet of ", betAmount, ".", "\n", sep = "")
 
+# Define function to set/reset global game parameters
+def parSet(initial = False):
+    global turnEndTypeP; turnEndTypeP = "none"
+    global turnEndTypeP1; turnEndTypeP1 = "none"
+    global turnEndTypeP2; turnEndTypeP2 = "none"
+    global turnEndTypeD; turnEndTypeD = "none"
+    global gameStage; gameStage = 1
+    global decisionNumP; decisionNumP = 1
+    global decisionNumD; decisionNumD = 1
+    global dbjCheckStage; dbjCheckStage = 1
+    global dbjInsuranceStage; dbjInsuranceStage = 0
+    global splitHandToggle; splitHandToggle = 1
+    global split; split = False
+    global doubled; doubled = False
+    global reloopD1; reloopD1 = False
+    global reloopD2; reloopD2 = False
+    global reloopD3; reloopD3 = False
+    global handOutP1; handOutP1 = False
+    global handOutP2; handOutP2 = False
+    global dbjCheck; dbjCheck = False
+    global dbjConfirmed; dbjConfirmed = False
+    global splitHandToggleOff; splitHandToggleOff = False
+    if initial == True:
+        global cheatUsed; cheatUsed = ""
+        global inputError; inputError = 0
+        global inputCheat; inputCheat = 0
+        global balance; balance = 1000
+        global betAmount; betAmount = 0
+        global insuranceAmount; insuranceAmount = 0
+        
 # Set initial values
-doubled = False
-split = False
-dbjConfirmed = False
-dbjCheck = False
-reloopD1 = False
-reloopD2 = False
-reloopD3 = False
-inputError = 0
-inputCheat = 0
-balance = 1000
-betAmount = 0
-insuranceAmount = 0
-gameStage = 1
-dbjCheckStage = 1
-dbjInsuranceStage = 0
-decisionNumP = 1
-decisionNumD = 1
-cheatUsed = ""
-turnEndTypeP = "none"
-turnEndTypeP1 = "none"
-turnEndTypeP2 = "none"
-turnEndTypeD = "none"
-splitHandToggle = 1
-splitHandToggleOff = False
+parSet(initial = True)
 
 
 
@@ -176,12 +213,12 @@ while gameStage >= 1:
         
         # Shuffle cards; deal to player and dealer
         cardQueue = shuffle()
-        cardDealer = []
-        cardPlayer = []          
-        draw("dealer")
-        draw("player")
-        draw("dealer")
-        draw("player")
+        cardDealer = ["5", "9"]
+        cardPlayer = ["8", "8"]          
+#        draw("dealer")
+#        draw("player")
+#        draw("dealer")
+#        draw("player")
         
         # Check for dealer blackjack
         if handSum(cardDealer) == 21:
@@ -303,10 +340,10 @@ while gameStage >= 1:
                 betAmount = int(betAmount)*0.5
                 gameStage = gameStage + 1
             else:
-                if decisionNumP == 1:
-                    decision = input("Your move. Hit, stand, double down, or surrender: ")
-                elif decisionNumP == 1 and cardPlayer[1] == cardPlayer[2]:
+                if decisionNumP == 1 and cardPlayer[0] == cardPlayer[1]:
                     decision = input("Your move. Hit, stand, double down, split, or surrender: ")
+                elif decisionNumP == 1:
+                    decision = input("Your move. Hit, stand, double down, or surrender: ")
                 elif decisionNumP > 1:
                     decision = input("You're still in. Hit or stand: ")
                 if decision in ["Hit", "hit"]:
@@ -325,11 +362,15 @@ while gameStage >= 1:
                     turnEndTypeP = "doubleDown"
                 elif decision in ["Surrender", "surrender"] and decisionNumP == 1:
                     turnEndTypeP = "surrender"
-                elif decision in ["Split", "split"] and decisionNumP == 1 and cardPlayer[1] == cardPlayer[2]:
-                    split = True
-                    cardPlayer1 = cardPlayer[1]
-                    cardPlayer2 = cardPlayer[2]
-                    gameStage = gameStage + 0.5
+                elif decision in ["Split", "split"] and decisionNumP == 1 and cardPlayer[0] == cardPlayer[1]:
+                    if balance < int(betAmount)*2:
+                        inputError = 7
+                    else:
+                        split = True
+                        betAmount = int(betAmount)*2
+                        cardPlayer1 = list(cardPlayer[0])
+                        cardPlayer2 = list(cardPlayer[1])
+                        gameStage = gameStage + 0.5
                 else:
                     inputError = 1
                 if inputError == 0:
@@ -352,10 +393,10 @@ while gameStage >= 1:
         print("Player totals", handSum(cardPlayer1), "with cards:", *cardPlayer1)
         print("Player totals", handSum(cardPlayer2), "with cards:", *cardPlayer2)
         balanceBet()
-        if decisionNumP == 1:
-            print("You were dealt card(s)", *cardPlayer, "\n")
-        elif turnEndTypeP != "stand" and turnEndTypeP != "surrender":
-            print("You were dealt card(s)", cardPlayer[len(cardPlayer) - 1], "\n")
+        if turnEndTypeP1 == "hit" and handOutP1 == False and splitHandToggle == 2:
+            print("You were dealt card(s)", cardPlayer1[len(cardPlayer1) - 1], "\n")
+        elif turnEndTypeP2 == "hit" and handOutP2 == False and splitHandToggle == 1:
+            print("You were dealt card(s)", cardPlayer2[len(cardPlayer2) - 1], "\n")
         else:
             print("\n")
         inputError = 0
@@ -368,54 +409,63 @@ while gameStage >= 1:
         
         # End-of-turn messages for player hand 2 and decision for hand 1
         if splitHandToggle == 1:
-            if turnEndTypeP1 not in ["bust", "stand"] and turnEndTypeP2 == "bust":
-                decision = input("Your second hand busts. Hit enter to continue... ")
-                splitHandToggle = 1
-                splitHandToggleOff == True
-            if turnEndTypeP1 not in ["bust", "stand"] and turnEndTypeP2 == "stand":
-                decision = input("You stand on your second hand. Hit enter to continue... ")
-                splitHandToggle = 1
-                splitHandToggleOff == True
-            if turnEndTypeP1 in ["bust", "stand"] and turnEndTypeP2 == "bust":
-                decision = input("Your last remaining hand busts; now it is the dealer's turn. Hit enter to continue... ")
-                gameStage = gameStage + 1
-            if turnEndTypeP1 in ["bust", "stand"] and turnEndTypeP2 == "stand":
-                decision = input("You stand on your last remaining hand; now it is the dealer's turn. Hit enter to continue... ")
-                gameStage = gameStage + 1
-            decision = input("Your first hand is active. Hit or stand: ")
-            if decision in ["Hit", "hit"]:
+            if handOutP2 == False:
+                if turnEndTypeP1 not in ["bust", "stand"] and turnEndTypeP2 == "bust":
+                    decision = input("Your second hand busts. Hit enter to continue... ")
+                    splitHandToggleOff == True
+                    handOutP2 = True
+                    continue
+                elif turnEndTypeP1 not in ["bust", "stand"] and turnEndTypeP2 == "stand":
+                    decision = input("You stand on your second hand. Hit enter to continue... ")
+                    splitHandToggleOff == True
+                    handOutP2 = True
+                    continue
+                elif turnEndTypeP1 in ["bust", "stand"] and turnEndTypeP2 == "bust":
+                    decision = input("Your last remaining hand busts; now it is the dealer's turn. Hit enter to continue... ")
+                    gameStage = gameStage + 0.5
+                elif turnEndTypeP1 in ["bust", "stand"] and turnEndTypeP2 == "stand":
+                    decision = input("You stand on your last remaining hand; now it is the dealer's turn. Hit enter to continue... ")
+                    gameStage = gameStage + 0.5
+            if turnEndTypeP1 not in ["bust", "stand"]:
+                decision1 = input("Your first hand is active. Hit or stand: ")
+            if decision1 in ["Hit", "hit"]:
                 draw("player1")
                 turnEndTypeP1 = "hit"
-            elif decision in ["Stand", "stand"]:
+            elif decision1 in ["Stand", "stand"]:
                 turnEndTypeP1 = "stand"
             else:
                 inputError = 1
             
         # End-of-turn messages for player hand 1 and decision for hand 2  
         if splitHandToggle == 2:
-            if turnEndTypeP1 == "bust" and turnEndTypeP2 not in ["bust", "stand"]:
-                decision = input("Your first hand busts. Hit enter to continue... ")
-                splitHandToggle = 2
-                splitHandToggleOff == True
-            if turnEndTypeP1 == "stand" and turnEndTypeP2 not in ["bust", "stand"]:
-                decision = input("You stand on your first hand. Hit enter to continue... ")
-                splitHandToggle = 2
-                splitHandToggleOff == True
-            if turnEndTypeP1 == "bust" and turnEndTypeP2 in ["bust", "stand"]:
-                decision = input("Your last remaining hand busts; now it is the dealer's turn. Hit enter to continue... ")
-                gameStage = gameStage + 1
-            if turnEndTypeP1 == "stand" and turnEndTypeP2 in ["bust", "stand"]:
-                decision = input("You stand on your last remaining hand; now it is the dealer's turn. Hit enter to continue... ")
-                gameStage = gameStage + 1
-            decision = input("Your second hand is active. Hit or stand: ")
-            if decision in ["Hit", "hit"]:
+            if handOutP1 == False:
+                if turnEndTypeP1 == "bust" and turnEndTypeP2 not in ["bust", "stand"]:
+                    decision = input("Your first hand busts. Hit enter to continue... ")
+                    splitHandToggleOff == True
+                    handOutP1 = True
+                    continue
+                elif turnEndTypeP1 == "stand" and turnEndTypeP2 not in ["bust", "stand"]:
+                    decision = input("You stand on your first hand. Hit enter to continue... ")
+                    splitHandToggleOff == True
+                    handOutP1 = True
+                    continue
+                elif turnEndTypeP1 == "bust" and turnEndTypeP2 in ["bust", "stand"]:
+                    decision = input("Your last remaining hand busts; now it is the dealer's turn. Hit enter to continue... ")
+                    gameStage = gameStage + 0.5
+                elif turnEndTypeP1 == "stand" and turnEndTypeP2 in ["bust", "stand"]:
+                    decision = input("You stand on your last remaining hand; now it is the dealer's turn. Hit enter to continue... ")
+                    gameStage = gameStage + 0.5
+            if turnEndTypeP2 not in ["bust", "stand"]:
+                decision2 = input("Your second hand is active. Hit or stand: ")
+            if decision2 in ["Hit", "hit"]:
                 draw("player2")
                 turnEndTypeP2 = "hit"
-            elif decision in ["Stand", "stand"]:
+            elif decision2 in ["Stand", "stand"]:
                 turnEndTypeP2 = "stand"
             else:
                 inputError = 1
         
+        # Toggle between hands
         if inputError == 0:
             if splitHandToggleOff == False:
                 if splitHandToggle == 1:
@@ -432,7 +482,11 @@ while gameStage >= 1:
         
         # Print initial messages and information
         print("Dealer totals", handSum(cardDealer), "with cards:", *cardDealer)
-        print("Player totals", handSum(cardPlayer), "with cards:", *cardPlayer)
+        if split == True:
+            print("Player totals", handSum(cardPlayer1), "with cards:", *cardPlayer1)
+            print("Player totals", handSum(cardPlayer2), "with cards:", *cardPlayer2)
+        else:
+            print("Player totals", handSum(cardPlayer), "with cards:", *cardPlayer)
         balanceBet()
         if decisionNumD == 1:
             print("\n")
@@ -525,43 +579,91 @@ while gameStage >= 1:
             print("Your balance is now", balance, "credits.", "\n", "\n", "\n")
         
         # Messages for instances where the player or dealer does not have blackjack
-        if turnEndTypeD != "blackjack" and turnEndTypeP != "blackjack":
-            if handSum(cardDealer) > 21 and handSum(cardPlayer) > 21:
-                balance = balance - int(betAmount)
-                endMessage("busts", "busts", "Loss")
-            elif handSum(cardDealer) > 21 and handSum(cardPlayer) <= 21:
-                balance = balance + int(betAmount)
-                endMessage("wins", "busts", "Payout")
-            elif handSum(cardDealer) <= 21 and handSum(cardPlayer) > 21:
-                balance = balance - int(betAmount)
-                endMessage("busts", "wins", "Loss")
-            elif handSum(cardDealer) <= 21 and handSum(cardPlayer) <= 21 and handSum(cardDealer) > handSum(cardPlayer):
-                balance = balance - int(betAmount)
-                endMessage("loses", "wins", "Loss")
-            elif handSum(cardDealer) <= 21 and handSum(cardPlayer) <= 21 and handSum(cardDealer) < handSum(cardPlayer):
-                balance = balance + int(betAmount)
-                endMessage("wins", "loses", "Payout")
-            elif handSum(cardDealer) <= 21 and handSum(cardPlayer) <= 21 and handSum(cardDealer) == handSum(cardPlayer):
-                endMessage("wins", "loses", "Payout", tie = True)
+        if split == False:
+            if turnEndTypeD != "blackjack" and turnEndTypeP != "blackjack":
+                if handSum(cardDealer) > 21 and handSum(cardPlayer) > 21:
+                    balance = balance - int(betAmount)
+                    endMessage("busts", "busts", "Loss")
+                elif handSum(cardDealer) > 21 and handSum(cardPlayer) <= 21:
+                    balance = balance + int(betAmount)
+                    endMessage("wins", "busts", "Payout")
+                elif handSum(cardDealer) <= 21 and handSum(cardPlayer) > 21:
+                    balance = balance - int(betAmount)
+                    endMessage("busts", "wins", "Loss")
+                elif handSum(cardDealer) <= 21 and handSum(cardPlayer) <= 21:
+                    if handSum(cardDealer) > handSum(cardPlayer):
+                        balance = balance - int(betAmount)
+                        endMessage("loses", "wins", "Loss")
+                    elif handSum(cardDealer) < handSum(cardPlayer):
+                        balance = balance + int(betAmount)
+                        endMessage("wins", "loses", "Payout")
+                    elif handSum(cardDealer) == handSum(cardPlayer):
+                        endMessage("wins", "ties", "Payout", tie = True)
                 
+        # Messages for instances where cards are split
+        if split == True:
+            if handSum(cardDealer) > 21 and handSum(cardPlayer1) > 21 and handSum(cardPlayer2) > 21:
+                balance = balance - int(betAmount)
+                endMessageSplit("busts", "busts", "busts", "busts", "Loss")
+            elif handSum(cardDealer) > 21 and handSum(cardPlayer1) > 21 and handSum(cardPlayer2) <= 21:
+                endMessageSplit("busts", "wins", "busts", "busts", "wash", wash = True)
+            elif handSum(cardDealer) > 21 and handSum(cardPlayer1) <= 21 and handSum(cardPlayer2) > 21:
+                endMessageSplit("wins", "busts", "busts", "busts", "wash", wash = True)
+            elif handSum(cardDealer) > 21 and handSum(cardPlayer1) <= 21 and handSum(cardPlayer2) <= 21:
+                balance = balance + int(betAmount)
+                endMessageSplit("wins", "wins", "busts", "busts", "Payout")
+            elif handSum(cardDealer) <= 21 and handSum(cardPlayer1) > 21 and handSum(cardPlayer2) > 21:
+                balance = balance - int(betAmount)
+                endMessageSplit("busts", "busts", "wins", "wins", "Loss")
+            elif handSum(cardDealer) <= 21 and (handSum(cardPlayer1) <= 21 or handSum(cardPlayer2) <= 21):
+                if handSum(cardPlayer1) > 21 and handSum(cardPlayer2) <= 21:
+                    if handSum(cardDealer) > handSum(cardPlayer2):
+                        balance = balance - int(betAmount)
+                        endMessageSplit("busts", "loses", "wins", "wins", "Loss")
+                    elif handSum(cardDealer) < handSum(cardPlayer2):
+                        endMessageSplit("busts", "wins", "wins", "loses", "wash", wash = True)
+                    elif handSum(cardDealer) == handSum(cardPlayer2):
+                        balance = balance - 0.5*int(betAmount); betAmount = 0.5*int(betAmount)
+                        endMessageSplit("busts", "ties", "wins", "ties", "Loss", tie1 = True)
+                elif handSum(cardPlayer1) <= 21 and handSum(cardPlayer2) > 21:
+                    if handSum(cardDealer) > handSum(cardPlayer1):
+                        balance = balance - int(betAmount)
+                        endMessageSplit("loses", "busts", "wins", "wins", "Loss")
+                    elif handSum(cardDealer) < handSum(cardPlayer1):
+                        endMessageSplit("wins", "busts", "loses", "wins", "wash", wash = True)
+                    elif handSum(cardDealer) == handSum(cardPlayer1):
+                        balance = balance - 0.5*int(betAmount); betAmount = 0.5*int(betAmount)
+                        endMessageSplit("ties", "busts", "ties", "wins", "Loss", tie2 = True)
+                elif handSum(cardPlayer1) <= 21 and handSum(cardPlayer2) <= 21:
+                    if handSum(cardDealer) > handSum(cardPlayer1) and handSum(cardDealer) > handSum(cardPlayer2):
+                        balance = balance - int(betAmount)
+                        endMessageSplit("loses", "loses", "wins", "wins", "Loss")
+                    elif handSum(cardDealer) > handSum(cardPlayer1) and handSum(cardDealer) < handSum(cardPlayer2):
+                        endMessageSplit("loses", "wins", "wins", "loses", "wash", wash = True)
+                    elif handSum(cardDealer) < handSum(cardPlayer1) and handSum(cardDealer) > handSum(cardPlayer2):
+                        endMessageSplit("wins", "loses", "loses", "wins", "wash", wash = True)
+                    elif handSum(cardDealer) < handSum(cardPlayer1) and handSum(cardDealer) < handSum(cardPlayer2):
+                        balance = balance + int(betAmount)
+                        endMessageSplit("wins", "wins", "loses", "loses", "Payout")
+                    elif handSum(cardDealer) == handSum(cardPlayer1) and handSum(cardDealer) > handSum(cardPlayer2):
+                        balance = balance - 0.5*int(betAmount); betAmount = 0.5*int(betAmount)
+                        endMessageSplit("ties", "loses", "ties", "wins", "Loss", tie1 = True)
+                    elif handSum(cardDealer) == handSum(cardPlayer1) and handSum(cardDealer) < handSum(cardPlayer2):
+                        balance = balance + 0.5*int(betAmount); betAmount = 0.5*int(betAmount)
+                        endMessageSplit("ties", "wins", "ties", "loses", "Payout", tie1 = True)
+                    elif handSum(cardDealer) > handSum(cardPlayer1) and handSum(cardDealer) == handSum(cardPlayer2):
+                        balance = balance - 0.5*int(betAmount); betAmount = 0.5*int(betAmount)
+                        endMessageSplit("loses", "ties", "wins", "ties", "Loss", tie2 = True)
+                    elif handSum(cardDealer) < handSum(cardPlayer1) and handSum(cardDealer) == handSum(cardPlayer2):
+                        balance = balance + 0.5*int(betAmount); betAmount = 0.5*int(betAmount)
+                        endMessageSplit("wins", "ties", "loses", "ties", "Payout", tie2 = True)
+                    elif handSum(cardDealer) == handSum(cardPlayer1) and handSum(cardDealer) == handSum(cardPlayer2):
+                        endMessageSplit("ties", "ties", "ties", "ties", "wash", tie1 = True, tie2 = True, wash = True)
+                        
         # Continue and reset variables        
         input("Press enter to continue... ")
-        turnEndTypeP = "none"
-        turnEndTypeD = "none"
-        doubled = False
-        split = False
-        decisionNumP = 1
-        decisionNumD = 1
-        reloopD1 = False
-        reloopD2 = False
-        reloopD3 = False
-        gameStage = 1
-        dbjCheckStage = 1
-        dbjCheck = False
-        dbjInsuranceStage = 0
-        dbjConfirmed = False
-        splitHandToggle = 1
-        splitHandToggleOff = False
+        parSet()
+        
         
         
         
