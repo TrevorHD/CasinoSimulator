@@ -412,18 +412,20 @@ while gameStage >= 1:
             if handOutP2 == False:
                 if turnEndTypeP1 not in ["bust", "stand"] and turnEndTypeP2 == "bust":
                     decision = input("Your second hand busts. Hit enter to continue... ")
-                    splitHandToggleOff == True
+                    splitHandToggleOff = True
                     handOutP2 = True
                     continue
                 elif turnEndTypeP1 not in ["bust", "stand"] and turnEndTypeP2 == "stand":
                     decision = input("You stand on your second hand. Hit enter to continue... ")
-                    splitHandToggleOff == True
+                    splitHandToggleOff = True
                     handOutP2 = True
                     continue
-                elif turnEndTypeP1 in ["bust", "stand"] and turnEndTypeP2 == "bust":
+            else:
+                if turnEndTypeP2 in ["bust", "stand"] and turnEndTypeP1 == "bust":
                     decision = input("Your last remaining hand busts; now it is the dealer's turn. Hit enter to continue... ")
+                    decision1 = "end"
                     gameStage = gameStage + 0.5
-                elif turnEndTypeP1 in ["bust", "stand"] and turnEndTypeP2 == "stand":
+                elif turnEndTypeP2 in ["bust", "stand"] and turnEndTypeP1 == "stand":
                     decision = input("You stand on your last remaining hand; now it is the dealer's turn. Hit enter to continue... ")
                     gameStage = gameStage + 0.5
             if turnEndTypeP1 not in ["bust", "stand"]:
@@ -433,6 +435,8 @@ while gameStage >= 1:
                 turnEndTypeP1 = "hit"
             elif decision1 in ["Stand", "stand"]:
                 turnEndTypeP1 = "stand"
+            elif decision1 == "end":
+                pass
             else:
                 inputError = 1
             
@@ -441,18 +445,20 @@ while gameStage >= 1:
             if handOutP1 == False:
                 if turnEndTypeP1 == "bust" and turnEndTypeP2 not in ["bust", "stand"]:
                     decision = input("Your first hand busts. Hit enter to continue... ")
-                    splitHandToggleOff == True
+                    splitHandToggleOff = True
                     handOutP1 = True
                     continue
                 elif turnEndTypeP1 == "stand" and turnEndTypeP2 not in ["bust", "stand"]:
                     decision = input("You stand on your first hand. Hit enter to continue... ")
-                    splitHandToggleOff == True
+                    splitHandToggleOff = True
                     handOutP1 = True
                     continue
-                elif turnEndTypeP1 == "bust" and turnEndTypeP2 in ["bust", "stand"]:
+            else:
+                if turnEndTypeP2 == "bust" and turnEndTypeP1 in ["bust", "stand"]:
                     decision = input("Your last remaining hand busts; now it is the dealer's turn. Hit enter to continue... ")
+                    decision2 = "end"
                     gameStage = gameStage + 0.5
-                elif turnEndTypeP1 == "stand" and turnEndTypeP2 in ["bust", "stand"]:
+                elif turnEndTypeP2 == "stand" and turnEndTypeP1 in ["bust", "stand"]:
                     decision = input("You stand on your last remaining hand; now it is the dealer's turn. Hit enter to continue... ")
                     gameStage = gameStage + 0.5
             if turnEndTypeP2 not in ["bust", "stand"]:
@@ -462,6 +468,8 @@ while gameStage >= 1:
                 turnEndTypeP2 = "hit"
             elif decision2 in ["Stand", "stand"]:
                 turnEndTypeP2 = "stand"
+            elif decision2 == "end":
+                pass
             else:
                 inputError = 1
         
