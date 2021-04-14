@@ -34,7 +34,7 @@ def gameMessage():
     if inputError == 1:
         print("Invalid input, try again.", "\n")
     elif inputError == 2:
-        print("You do not have enough credits. Please enter a smaller amount.", "\n")
+        print("You do not have enough credits for this.", "\n")
     elif inputCheat == 1:
         print("2000 credits added to your balance. Gambling on credit seems a bit irresponsible, no?", "\n")
     elif inputCheat == 2:
@@ -52,6 +52,7 @@ def parSet(initial = False):
     global gameStage; gameStage = 1
     global spinNum; spinNum = 0
     if initial == True:
+        global wildcard; wildcard = False
         global cheatUsed; cheatUsed = ""
         global betType; betType = "none"
         global inputError; inputError = 0
@@ -80,13 +81,13 @@ while gameStage >= 1:
     
         # Accept bet amount or cheat code
         gameMessage()
-        print("You have", balance, "credits remaining in your account.")
+        print("Your current balance is", balance, "credits. The following stakes levels are available:\n")
+        print("   - Low: 10 credits per play.\n", "   - Medium: 25 credits per play.\n",
+              "   - High: 50 credits per play.\n", sep = "")
         inputError = 0
         inputCheat = 0
-        betType = input("Please enter low, medium, or high: ")
-        if betType == "b":
-            gameStage = gameStage - 1
-        elif betType in ["Low", "low", "L", "l"]:
+        betType = input("Please choose a low, medium, or high stakes level: ")
+        if betType in ["Low", "low", "L", "l"]:
             betType = "low"
             betAmount = 10
         elif betType in ["Medium", "medium", "M", "m"]:
@@ -110,37 +111,40 @@ while gameStage >= 1:
                 cheatUsed = cheatUsed + "s"
             else:
                 inputCheat = 3
+        else:
+            inputError = 1
         if int(betAmount) > balance:
             inputError = 2
         elif int(betAmount) > 0:
             gameStage = gameStage + 1
-        else:
-            inputError = 1
+        
     
     # ----- Step 2: Spin Wheels -----------------------------------------------
     
-    # Choose amount to bet
+    # Spin the three slot wheels
     while gameStage == 2:
         clear()
         print("-"*5, "STEP 2: Spin Wheels", "-"*89, "\n")
 
+        # Print balance and error (if applicable)
         gameMessage()
         balanceBet()
-
+        
+        # Spin wheels sequentially
         if spinNum == 0:
             print("[    ] [    ] [    ]\n\n", "Spin in progress...", sep = "")
             time.sleep(1.5)
         if spinNum == 1:
             w1 = spin(betType)
-            print("[", *w1, "] [    ] [    ]\n\n", "Spin in progress.", sep = "")
+            print("[", *w1, "] [    ] [    ]\n\n", "Spin in progress...", sep = "")
             time.sleep(1.5)
         if spinNum == 2:
             w2 = spin(betType)
-            print("[", *w1, "] [", *w2, "] [    ]\n\n", "Spin in progress.", sep = "")
+            print("[", *w1, "] [", *w2, "] [    ]\n\n", "Spin in progress...", sep = "")
             time.sleep(1.5)
         if spinNum == 3:
             w3 = spin(betType)
-            print("[", *w1, "] [", *w2, "] [", *w3, "]\n\n", "Spin in progress.", sep = "")
+            print("[", *w1, "] [", *w2, "] [", *w3, "]\n\n", "Spin in progress...", sep = "")
             time.sleep(1.5)
         if spinNum == 4:
             print("[", *w1, "] [", *w2, "] [", *w3, "]\n", sep = "")
@@ -149,14 +153,16 @@ while gameStage >= 1:
         spinNum = spinNum + 1
         
     # ----- Step 3: Calculate Winnings ---------------------------------------  
-     
-    # test
+    
+    # Calculate winnings and print earnings statements
     while gameStage == 3:
         clear()
         print("-"*5, "STEP 3: Calculate Winnings", "-"*82, "\n")
         
+        # Print error if applicable
         gameMessage()
         
+        # Calculate earnings
         if inputError != 1:
             if w1 == w2 == w3 != ["****"]:
                 w = int(w1[0].replace('x', ''))
@@ -165,27 +171,47 @@ while gameStage >= 1:
                 tempW.remove("****")
                 if(tempW[0] == tempW[1]):
                     w = int(tempW[0].replace('x', ''))
+                else:
+                    w = -1
             elif (w1+w2+w3).count("****") == 2:
                 tempW = w1+w2+w3
                 tempW.remove("****")
                 tempW.remove("****")
                 w = int(tempW[0].replace('x', ''))
             elif (w1+w2+w3).count("****") == 3:
-                w = 100
+                w = 0
             else:
                 w = -1
             winnings = w*betAmount
-            balance = balance + winnings
-            
+            if wildcard == True:
+                winningsWC = w*betAmount*100
+                balance = balance + winningsWC
+            else:
+                balance = balance + winnings
+        
+        # Print balance and earnings statements
         balanceBet()
         print("[", *w1, "] [", *w2, "] [", *w3, "]\n", sep = "")
         if w > 0:
-            print("You matched a", "x"+str(w), "payout and won", winnings, "credits!")
+            if (w1+w2+w3).count("****") == 0:
+                print("You matched a", "x"+str(w), "payout and won", winnings, "credits!")
+            elif (w1+w2+w3).count("****") == 1:
+                print("You matched a", "x"+str(w), "payout with a wildcard and won", winnings, "credits!")
+            elif (w1+w2+w3).count("****") == 2:
+                print("You matched a", "x"+str(w), "payout with two wildcards and won", winnings, "credits!")
         elif w < 0:
             print("You didn't match anything and lost", -winnings, "credits.")
-        endGame = input("Enter \"m\" to return to wheel menu, or hit enter to play again: ")
-        inputError = 0
+        if w == 0 or wildcard == True:
+            if wildcard == False:
+                wildcard = True
+                print("You matched three wildcards and will have your next win multiplied x100!")
+            elif wildcard == True:
+                wildcard = False
+                print("Your previous wildcard bonus multiplied your winnings x100 for a total of", winningsWC, "credits!")
         
+        # Replay or go to main menu
+        endGame = input("Enter \"m\" to return to main menu, or hit enter to play again: ")
+        inputError = 0
         if endGame == "m":
             parSet()
         elif endGame == "":
@@ -195,8 +221,3 @@ while gameStage >= 1:
             inputError = 1
             
         
-        
-        
-        
-    
-    
