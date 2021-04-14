@@ -44,6 +44,9 @@ def gameMessage():
     else:
         print("\n")
 
+def balanceBet():
+    print("Your current balance is ", balance, " credits. \n", sep = "")
+
 # Define function to set/reset global game parameters
 def parSet(initial = False):
     global gameStage; gameStage = 1
@@ -121,23 +124,27 @@ while gameStage >= 1:
         clear()
         print("-"*5, "STEP 2: Spin Wheels", "-"*89, "\n")
 
-        if(spinNum == 0):
-            print("[    ] [    ] [    ]")
+        gameMessage()
+        balanceBet()
+
+        if spinNum == 0:
+            print("[    ] [    ] [    ]\n\n", "Spin in progress...", sep = "")
             time.sleep(1.5)
-        if(spinNum == 1):
+        if spinNum == 1:
             w1 = spin(betType)
-            print("[", *w1, "] [    ] [    ]", sep = "")
+            print("[", *w1, "] [    ] [    ]\n\n", "Spin in progress.", sep = "")
             time.sleep(1.5)
-        if(spinNum == 2):
+        if spinNum == 2:
             w2 = spin(betType)
-            print("[", *w1, "] [", *w2, "] [    ]", sep = "")
+            print("[", *w1, "] [", *w2, "] [    ]\n\n", "Spin in progress.", sep = "")
             time.sleep(1.5)
-        if(spinNum == 3):
+        if spinNum == 3:
             w3 = spin(betType)
-            print("[", *w1, "] [", *w2, "] [", *w3, "]", sep = "")
+            print("[", *w1, "] [", *w2, "] [", *w3, "]\n\n", "Spin in progress.", sep = "")
             time.sleep(1.5)
-        if(spinNum == 4):
-            input("Hit enter to continue...")
+        if spinNum == 4:
+            print("[", *w1, "] [", *w2, "] [", *w3, "]\n", sep = "")
+            input("Spin complete. Hit enter to continue... ")
             gameStage = gameStage + 1
         spinNum = spinNum + 1
         
@@ -148,30 +155,44 @@ while gameStage >= 1:
         clear()
         print("-"*5, "STEP 3: Calculate Winnings", "-"*82, "\n")
         
-        if w1 == w2 == w3 != "****":
-            w = int(w1[0].replace('x', ''))
-        elif (w1+w2+w3).count("****") == 1:
-            tempW = w1+w2+w3
-            tempW.remove("****")
-            if(tempW[0] == tempW[1]):
-                w = int(tempW[0].replace('x', ''))
-        elif (w1+w2+w3).count("****") == 2:
-            tempW = w1+w2+w3
-            tempW.remove("****")
-            tempW.remove("****")
-            w = int(tempW[0].replace('x', ''))
-        elif (w1+w2+w3).count("****") == 3:
-            w = 100
-        else:
-            w = -1
-            
-        winnings = w*betAmount
-        balance = balance + winnings
+        gameMessage()
         
-        print("You have won", winnings, "credits.")
-        print("You now have a balance of", balance, "credits.")
-        input("Hit enter to continue...")
-        parSet()
+        if inputError != 1:
+            if w1 == w2 == w3 != ["****"]:
+                w = int(w1[0].replace('x', ''))
+            elif (w1+w2+w3).count("****") == 1:
+                tempW = w1+w2+w3
+                tempW.remove("****")
+                if(tempW[0] == tempW[1]):
+                    w = int(tempW[0].replace('x', ''))
+            elif (w1+w2+w3).count("****") == 2:
+                tempW = w1+w2+w3
+                tempW.remove("****")
+                tempW.remove("****")
+                w = int(tempW[0].replace('x', ''))
+            elif (w1+w2+w3).count("****") == 3:
+                w = 100
+            else:
+                w = -1
+            winnings = w*betAmount
+            balance = balance + winnings
+            
+        balanceBet()
+        print("[", *w1, "] [", *w2, "] [", *w3, "]\n", sep = "")
+        if w > 0:
+            print("You matched a", "x"+str(w), "payout and won", winnings, "credits!")
+        elif w < 0:
+            print("You didn't match anything and lost", -winnings, "credits.")
+        endGame = input("Enter \"m\" to return to wheel menu, or hit enter to play again: ")
+        inputError = 0
+        
+        if endGame == "m":
+            parSet()
+        elif endGame == "":
+            gameStage = 2
+            spinNum = 0
+        else:
+            inputError = 1
             
         
         
