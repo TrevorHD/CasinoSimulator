@@ -2,6 +2,7 @@
 
 # Import packages
 import random
+import time
 import os
 
 
@@ -15,9 +16,9 @@ def clear(): os.system('cls')
 clear()
 
 # Define possible outcomes on wheels: low, medium, and high stakes
-stakesL = [2, 2, 2, 2, 2, 2, 2, 2, 2, 5, 5, 5, 5, 10, 10, 100, "*", "*"]
-stakesM = [2, 2, 2, 2, 2, 2, 2, 5, 5, 5, 5, 10, 10, 50, 100, 250, "*"]
-stakesH = [2, 2, 2, 2, 2, 5, 5, 5, 5, 10, 10, 50, 100, 250, 1000, "*"]
+stakesL = ["x002"]*11 + ["x005"]*7 + ["x010"]*3 + ["x100"]*2 + ["****"]*2
+stakesM = ["x002"]*9 + ["x005"]*6 + ["x010"]*4 + ["x050"]*3 + ["x100"]*2 + ["x250"]*1 + ["****"]*1
+stakesH = ["x002"]*8 + ["x005"]*5 + ["x010"]*4 + ["x050"]*3 + ["x100"]*2 + ["x250"]*1 + ["x999"]*1 + ["****"]*1
 
 # Function to spin a wheel once
 def spin(stakes):
@@ -33,8 +34,6 @@ def gameMessage():
     if inputError == 1:
         print("Invalid input, try again.", "\n")
     elif inputError == 2:
-        print("Please enter a number greater than zero.", "\n")
-    elif inputError == 3:
         print("You do not have enough credits. Please enter a smaller amount.", "\n")
     elif inputCheat == 1:
         print("2000 credits added to your balance. Gambling on credit seems a bit irresponsible, no?", "\n")
@@ -48,8 +47,10 @@ def gameMessage():
 # Define function to set/reset global game parameters
 def parSet(initial = False):
     global gameStage; gameStage = 1
+    global spinNum; spinNum = 0
     if initial == True:
         global cheatUsed; cheatUsed = ""
+        global betType; betType = "none"
         global inputError; inputError = 0
         global inputCheat; inputCheat = 0
         global balance; balance = 1000
@@ -79,17 +80,26 @@ while gameStage >= 1:
         print("You have", balance, "credits remaining in your account.")
         inputError = 0
         inputCheat = 0
-        betAmount = input("Please enter a whole amount to wager: ")
-        if betAmount == "b":
+        betType = input("Please enter low, medium, or high: ")
+        if betType == "b":
             gameStage = gameStage - 1
-        elif betAmount in ["Loan", "loan"]:
+        elif betType in ["Low", "low", "L", "l"]:
+            betType = "low"
+            betAmount = 10
+        elif betType in ["Medium", "medium", "M", "m"]:
+            betType = "medium"
+            betAmount = 25
+        elif betType in ["High", "high", "H", "h"]:
+            betType = "high"
+            betAmount = 50
+        elif betType in ["Loan", "loan"]:
             if cheatUsed in ["", "s"]:
                 balance = balance + 2000
                 inputCheat = 1
                 cheatUsed = cheatUsed + "l"
             else:
                 inputCheat = 3
-        elif betAmount in ["Savings Account", "Savings account", "savings account", "savings Account", 
+        elif betType in ["Savings Account", "Savings account", "savings account", "savings Account", 
                            "SavingsAccount", "Savingsaccount", "savingsaccount", "savingsAccount"]:
             if cheatUsed in ["", "l"]:
                 balance = balance + 1000
@@ -97,18 +107,75 @@ while gameStage >= 1:
                 cheatUsed = cheatUsed + "s"
             else:
                 inputCheat = 3
+        if int(betAmount) > balance:
+            inputError = 2
+        elif int(betAmount) > 0:
+            gameStage = gameStage + 1
         else:
-            try:
-                if int(betAmount) > balance:
-                    inputError = 3
-                elif int(betAmount) <= 0:
-                    inputError = 2
-                else:
-                    gameStage = gameStage + 1
-            except ValueError:
-                inputError = 1
+            inputError = 1
     
+    # ----- Step 2: Spin Wheels -----------------------------------------------
     
-    
+    # Choose amount to bet
+    while gameStage == 2:
+        clear()
+        print("-"*5, "STEP 2: Spin Wheels", "-"*89, "\n")
+
+        if(spinNum == 0):
+            print("[    ] [    ] [    ]")
+            time.sleep(1.5)
+        if(spinNum == 1):
+            w1 = spin(betType)
+            print("[", *w1, "] [    ] [    ]", sep = "")
+            time.sleep(1.5)
+        if(spinNum == 2):
+            w2 = spin(betType)
+            print("[", *w1, "] [", *w2, "] [    ]", sep = "")
+            time.sleep(1.5)
+        if(spinNum == 3):
+            w3 = spin(betType)
+            print("[", *w1, "] [", *w2, "] [", *w3, "]", sep = "")
+            time.sleep(1.5)
+        if(spinNum == 4):
+            input("Hit enter to continue...")
+            gameStage = gameStage + 1
+        spinNum = spinNum + 1
+        
+    # ----- Step 3: Calculate Winnings ---------------------------------------  
+     
+    # test
+    while gameStage == 3:
+        clear()
+        print("-"*5, "STEP 3: Calculate Winnings", "-"*82, "\n")
+        
+        if w1 == w2 == w3 != "****":
+            w = int(w1[0].replace('x', ''))
+        elif (w1+w2+w3).count("****") == 1:
+            tempW = w1+w2+w3
+            tempW.remove("****")
+            if(tempW[0] == tempW[1]):
+                w = int(tempW[0].replace('x', ''))
+        elif (w1+w2+w3).count("****") == 2:
+            tempW = w1+w2+w3
+            tempW.remove("****")
+            tempW.remove("****")
+            w = int(tempW[0].replace('x', ''))
+        elif (w1+w2+w3).count("****") == 3:
+            w = 100
+        else:
+            w = -1
+            
+        winnings = w*betAmount
+        balance = balance + winnings
+        
+        print("You have won", winnings, "credits.")
+        print("You now have a balance of", balance, "credits.")
+        input("Hit enter to continue...")
+        parSet()
+            
+        
+        
+        
+        
     
     
