@@ -47,6 +47,50 @@ def gameMessage():
 def balanceBet():
     print("Your current balance is ", balance, " credits. \n", sep = "")
 
+# Define function to get per-game expected value of n games
+# Used to "calibrate" the wheels and make game more or less favourable to player
+# Slightly negative values are recommended to maintain house advantage
+# This may take a bit for large values of n; n = 10000000 is recommended
+def calibrate(stakes, n):
+    for i in range(1, n + 1):
+        if stakes == "low":
+            betAmount = 10
+        elif stakes == "medium":
+            betAmount = 25
+        elif stakes == "high":
+            betAmount = 50
+        if i == 1:
+            wildcard = False
+            winningList = []
+        w1 = spin(stakes)
+        w2 = spin(stakes)
+        w3 = spin(stakes)
+        if w1 == w2 == w3 != ["****"]:
+            w = int(w1[0].replace('x', ''))
+        elif (w1+w2+w3).count("****") == 1:
+            tempW = w1+w2+w3
+            tempW.remove("****")
+            if(tempW[0] == tempW[1]):
+                w = int(tempW[0].replace('x', ''))
+            else:
+                w = -1
+        elif (w1+w2+w3).count("****") == 2:
+            tempW = w1+w2+w3
+            tempW.remove("****")
+            tempW.remove("****")
+            w = int(tempW[0].replace('x', ''))
+        elif (w1+w2+w3).count("****") == 3:
+            w = 0
+            wildcard = True
+        else:
+            w = -1
+        winnings = w*betAmount
+        if wildcard == True and w > 0:
+            wildcard = False
+            winnings = w*betAmount*100
+        winningList.append(winnings)
+    return(sum(winningList)/len(winningList))
+
 # Define function to set/reset global game parameters
 def parSet(initial = False):
     global gameStage; gameStage = 1
