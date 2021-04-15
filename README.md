@@ -1,6 +1,6 @@
 # CasinoSimulator
 
-A set of text-based casino games, built in Python, that are designed to run on the command line or Python interpreter. This series containes three casino favourites: blackjack, roulette, and slots.
+A set of text-based casino games, built in Python, that are designed to run on the command line or Python interpreter. This series contains three casino favourites: blackjack, roulette, and slots.
 
 ## Scripts
 
