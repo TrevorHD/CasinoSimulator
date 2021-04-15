@@ -16,9 +16,9 @@ def clear(): os.system('cls')
 clear()
 
 # Define possible outcomes on wheels: low, medium, and high stakes
-stakesL = ["x002"]*11 + ["x005"]*7 + ["x010"]*3 + ["x100"]*2 + ["****"]*2
-stakesM = ["x002"]*9 + ["x005"]*6 + ["x010"]*4 + ["x050"]*3 + ["x100"]*2 + ["x250"]*1 + ["****"]*1
-stakesH = ["x002"]*8 + ["x005"]*5 + ["x010"]*4 + ["x050"]*3 + ["x100"]*2 + ["x250"]*1 + ["x999"]*1 + ["****"]*1
+stakesL = ["x002"]*46 + ["x005"]*27 + ["x010"]*13 + ["x050"]*7 + ["x100"]*3 + ["****"]*4
+stakesM = ["x002"]*51 + ["x005"]*25 + ["x010"]*11 + ["x050"]*5 + ["x100"]*3 + ["x250"]*1 + ["****"]*4
+stakesH = ["x002"]*51 + ["x005"]*23 + ["x010"]*11 + ["x050"]*5 + ["x100"]*3 + ["x250"]*2 + ["x500"]*1 + ["****"]*4
 
 # Function to spin a wheel once
 def spin(stakes):
@@ -44,6 +44,7 @@ def gameMessage():
     else:
         print("\n")
 
+# Define function to pring current balance
 def balanceBet():
     print("Your current balance is ", balance, " credits. \n", sep = "")
 
