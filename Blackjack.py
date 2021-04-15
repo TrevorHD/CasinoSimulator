@@ -135,6 +135,7 @@ def parSet(initial = False):
     global dbjCheckStage; dbjCheckStage = 1
     global dbjInsuranceStage; dbjInsuranceStage = 0
     global splitHandToggle; splitHandToggle = 1
+    global ruleScreen; ruleScreen = False
     global split; split = False
     global doubled; doubled = False
     global reloopD1; reloopD1 = False
@@ -169,6 +170,22 @@ while gameStage >= 1:
     
     # Choose amount to bet
     while gameStage == 1:
+        
+        # Print rules screen
+        if ruleScreen == True:
+            clear()
+            print("-"*5, "Rules", "-"*103, "\n")
+            print("Game rules:\n")
+            print("   - Dealer draws at 16 or less and stands on 17 or higher, regardless of whether hand is soft or hard\n",
+                  "   - Double down available only on initial turn and is not restricted to soft or hard hand\n",
+                  "   - Splitting allowed for all number cards, but only identical face cards; cannot be successive\n",
+                  "   - Surrender can only be early and cannot occur after initial turn\n",
+                  "   - All blackjacks pay 3:2 unless dealer also has blackjack\n",
+                  "   - Insurance pays 1:1\n", sep = "")
+            ruleScreen = input("Hit enter to continue... ")
+            ruleScreen = False
+        
+        # Print header
         clear()
         print("-"*5, "STEP 1: Select Wager", "-"*88, "\n")
         
@@ -177,9 +194,9 @@ while gameStage >= 1:
         print("You have", balance, "credits remaining in your account.")
         inputError = 0
         inputCheat = 0
-        betAmount = input("Please enter a whole amount to wager: ")
-        if betAmount == "b":
-            gameStage = gameStage - 1
+        betAmount = input("Please choose a whole amount to wager, or enter \"r\" to view rules: ")
+        if betAmount == "r":
+            ruleScreen = True
         elif betAmount in ["Loan", "loan"]:
             if cheatUsed in ["", "s"]:
                 balance = balance + 2000
@@ -233,6 +250,8 @@ while gameStage >= 1:
     
     # Allow player to take turn
     while gameStage == 2:
+        
+        # Print header
         clear()
         print("-"*5, "STEP 2: Player Turns", "-"*88, "\n")
         
@@ -384,6 +403,8 @@ while gameStage >= 1:
     
     # Allow player to take turn
     while gameStage == 2.5:
+        
+        # Print header
         clear()
         print("-"*5, "STEP 2: Player Turns", "-"*88, "\n")
         
@@ -485,6 +506,8 @@ while gameStage >= 1:
     # ----- Step 3: Dealer decisions ------------------------------------------
     
     while gameStage == 3:
+        
+        # Print header
         clear()
         print("-"*5, "STEP 3: Dealer Turns", "-"*88, "\n", "\n", "\n")
         
@@ -561,25 +584,31 @@ while gameStage >= 1:
     
     # Print appropriate result message
     while gameStage == 4:
+        
+        # Print header
         clear()
-        print("-"*5, "STEP 4: Results", "-"*93, "\n", "\n", "\n")
+        print("-"*5, "STEP 4: Results", "-"*93, "\n")
         
         # Messages for instances where the player or dealer has blackjack
+        gameMessage()
         if turnEndTypeD == "blackjack" and turnEndTypeP != "blackjack":
             if int(insuranceAmount) > 0:
                 print("Dealer has blackjack; Player loses, but collects insurance.")
                 print("Loss of ", betAmount, ", but ", insuranceAmount, " collected from insurance.", sep = "")
-                balance = balance - int(betAmount) + int(insuranceAmount)
+                if inputError == 0:
+                    balance = balance - int(betAmount) + int(insuranceAmount)
                 print("Your balance is now", balance, "credits.", "\n", "\n", "\n")
             else:
                 print("Dealer has blackjack; Player loses.")
                 print("Loss of ", betAmount, ".", sep = "")
-                balance = balance - int(betAmount)
+                if inputError == 0:
+                    balance = balance - int(betAmount)
                 print("Your balance is now", balance, "credits.", "\n", "\n", "\n")
         elif turnEndTypeD != "blackjack" and turnEndTypeP == "blackjack":
             print("Player has blackjack; dealer loses.")
             print("Payout of ", 0.5*int(betAmount), ".", sep = "")
-            balance = balance + 0.5*int(betAmount)
+            if inputError == 0:
+                balance = balance + 0.5*int(betAmount)
             print("Your balance is now", balance, "credits.", "\n", "\n", "\n")
         elif turnEndTypeD == "blackjack" and turnEndTypeP == "blackjack":
             print("Player and Dealer both have blackjack.")
@@ -592,23 +621,29 @@ while gameStage >= 1:
                 if turnEndTypeP == "surrender":
                     print("Player surrenders; Dealer wins.")
                     print("Loss of ", int(betAmount), " credits from forfeited bet.", sep = "")
-                    balance = balance - int(betAmount)
+                    if inputError == 0:
+                        balance = balance - int(betAmount)
                     print("Your balance is now", balance, "credits.", "\n", "\n", "\n")
                 elif handSum(cardDealer) > 21 and handSum(cardPlayer) > 21:
-                    balance = balance - int(betAmount)
+                    if inputError == 0:
+                        balance = balance - int(betAmount)
                     endMessage("busts", "busts", "Loss")
                 elif handSum(cardDealer) > 21 and handSum(cardPlayer) <= 21:
-                    balance = balance + int(betAmount)
+                    if inputError == 0:
+                        balance = balance + int(betAmount)
                     endMessage("wins", "busts", "Payout")
                 elif handSum(cardDealer) <= 21 and handSum(cardPlayer) > 21:
-                    balance = balance - int(betAmount)
+                    if inputError == 0:
+                        balance = balance - int(betAmount)
                     endMessage("busts", "wins", "Loss")
                 elif handSum(cardDealer) <= 21 and handSum(cardPlayer) <= 21:
                     if handSum(cardDealer) > handSum(cardPlayer):
-                        balance = balance - int(betAmount)
+                        if inputError == 0:
+                            balance = balance - int(betAmount)
                         endMessage("loses", "wins", "Loss")
                     elif handSum(cardDealer) < handSum(cardPlayer):
-                        balance = balance + int(betAmount)
+                        if inputError == 0:
+                            balance = balance + int(betAmount)
                         endMessage("wins", "loses", "Payout")
                     elif handSum(cardDealer) == handSum(cardPlayer):
                         endMessage("wins", "ties", "Payout", tie = True)
@@ -616,72 +651,91 @@ while gameStage >= 1:
         # Messages for instances where cards are split
         if split == True:
             if handSum(cardDealer) > 21 and handSum(cardPlayer1) > 21 and handSum(cardPlayer2) > 21:
-                balance = balance - int(betAmount)
+                if inputError == 0:
+                    balance = balance - int(betAmount)
                 endMessageSplit("busts", "busts", "busts", "busts", "Loss")
             elif handSum(cardDealer) > 21 and handSum(cardPlayer1) > 21 and handSum(cardPlayer2) <= 21:
                 endMessageSplit("busts", "wins", "busts", "busts", "wash", wash = True)
             elif handSum(cardDealer) > 21 and handSum(cardPlayer1) <= 21 and handSum(cardPlayer2) > 21:
                 endMessageSplit("wins", "busts", "busts", "busts", "wash", wash = True)
             elif handSum(cardDealer) > 21 and handSum(cardPlayer1) <= 21 and handSum(cardPlayer2) <= 21:
-                balance = balance + int(betAmount)
+                if inputError == 0:
+                    balance = balance + int(betAmount)
                 endMessageSplit("wins", "wins", "busts", "busts", "Payout")
             elif handSum(cardDealer) <= 21 and handSum(cardPlayer1) > 21 and handSum(cardPlayer2) > 21:
-                balance = balance - int(betAmount)
+                if inputError == 0:
+                    balance = balance - int(betAmount)
                 endMessageSplit("busts", "busts", "wins", "wins", "Loss")
             elif handSum(cardDealer) <= 21 and (handSum(cardPlayer1) <= 21 or handSum(cardPlayer2) <= 21):
                 if handSum(cardPlayer1) > 21 and handSum(cardPlayer2) <= 21:
                     if handSum(cardDealer) > handSum(cardPlayer2):
-                        balance = balance - int(betAmount)
+                        if inputError == 0:
+                            balance = balance - int(betAmount)
                         endMessageSplit("busts", "loses", "wins", "wins", "Loss")
                     elif handSum(cardDealer) < handSum(cardPlayer2):
                         endMessageSplit("busts", "wins", "wins", "loses", "wash", wash = True)
                     elif handSum(cardDealer) == handSum(cardPlayer2):
-                        balance = balance - 0.5*int(betAmount); betAmount = 0.5*int(betAmount)
+                        if inputError == 0:
+                            balance = balance - 0.5*int(betAmount)
+                            betAmount = 0.5*int(betAmount)
                         endMessageSplit("busts", "ties", "wins", "ties", "Loss", tie1 = True)
                 elif handSum(cardPlayer1) <= 21 and handSum(cardPlayer2) > 21:
                     if handSum(cardDealer) > handSum(cardPlayer1):
-                        balance = balance - int(betAmount)
+                        if inputError == 0:
+                            balance = balance - int(betAmount)
                         endMessageSplit("loses", "busts", "wins", "wins", "Loss")
                     elif handSum(cardDealer) < handSum(cardPlayer1):
                         endMessageSplit("wins", "busts", "loses", "wins", "wash", wash = True)
                     elif handSum(cardDealer) == handSum(cardPlayer1):
-                        balance = balance - 0.5*int(betAmount); betAmount = 0.5*int(betAmount)
+                        if inputError == 0:
+                            balance = balance - 0.5*int(betAmount)
+                            betAmount = 0.5*int(betAmount)
                         endMessageSplit("ties", "busts", "ties", "wins", "Loss", tie2 = True)
                 elif handSum(cardPlayer1) <= 21 and handSum(cardPlayer2) <= 21:
                     if handSum(cardDealer) > handSum(cardPlayer1) and handSum(cardDealer) > handSum(cardPlayer2):
-                        balance = balance - int(betAmount)
+                        if inputError == 0:
+                            balance = balance - int(betAmount)
                         endMessageSplit("loses", "loses", "wins", "wins", "Loss")
                     elif handSum(cardDealer) > handSum(cardPlayer1) and handSum(cardDealer) < handSum(cardPlayer2):
                         endMessageSplit("loses", "wins", "wins", "loses", "wash", wash = True)
                     elif handSum(cardDealer) < handSum(cardPlayer1) and handSum(cardDealer) > handSum(cardPlayer2):
                         endMessageSplit("wins", "loses", "loses", "wins", "wash", wash = True)
                     elif handSum(cardDealer) < handSum(cardPlayer1) and handSum(cardDealer) < handSum(cardPlayer2):
-                        balance = balance + int(betAmount)
+                        if inputError == 0:
+                            balance = balance + int(betAmount)
                         endMessageSplit("wins", "wins", "loses", "loses", "Payout")
                     elif handSum(cardDealer) == handSum(cardPlayer1) and handSum(cardDealer) > handSum(cardPlayer2):
-                        balance = balance - 0.5*int(betAmount); betAmount = 0.5*int(betAmount)
+                        if inputError == 0:
+                            balance = balance - 0.5*int(betAmount)
+                            betAmount = 0.5*int(betAmount)
                         endMessageSplit("ties", "loses", "ties", "wins", "Loss", tie1 = True)
                     elif handSum(cardDealer) == handSum(cardPlayer1) and handSum(cardDealer) < handSum(cardPlayer2):
-                        balance = balance + 0.5*int(betAmount); betAmount = 0.5*int(betAmount)
+                        if inputError == 0:
+                            balance = balance + 0.5*int(betAmount)
+                            betAmount = 0.5*int(betAmount)
                         endMessageSplit("ties", "wins", "ties", "loses", "Payout", tie1 = True)
                     elif handSum(cardDealer) > handSum(cardPlayer1) and handSum(cardDealer) == handSum(cardPlayer2):
-                        balance = balance - 0.5*int(betAmount); betAmount = 0.5*int(betAmount)
+                        if inputError == 0:
+                            balance = balance - 0.5*int(betAmount)
+                            betAmount = 0.5*int(betAmount)
                         endMessageSplit("loses", "ties", "wins", "ties", "Loss", tie2 = True)
                     elif handSum(cardDealer) < handSum(cardPlayer1) and handSum(cardDealer) == handSum(cardPlayer2):
-                        balance = balance + 0.5*int(betAmount); betAmount = 0.5*int(betAmount)
+                        if inputError == 0:
+                            balance = balance + 0.5*int(betAmount)
+                            betAmount = 0.5*int(betAmount)
                         endMessageSplit("wins", "ties", "loses", "ties", "Payout", tie2 = True)
                     elif handSum(cardDealer) == handSum(cardPlayer1) and handSum(cardDealer) == handSum(cardPlayer2):
                         endMessageSplit("ties", "ties", "ties", "ties", "wash", tie1 = True, tie2 = True, wash = True)
                         
         # Continue and reset variables        
-        input("Press enter to continue... ")
-        parSet()
+        endGame = input("Enter \"m\" to return to main menu, or hit enter to play again using the same bet: ")
+        inputError = 0
+        if endGame == "m":
+            parSet()
+        elif endGame == "":
+            parSet()
+            gameStage = 1.5
+        else:
+            inputError = 1
         
-        
-        
-        
-        
-        
-    # Rules: dealer must draw on 16 and stand on 17, early surrender only, double down
-    #        available on soft count (even with aces) on initial hand only, blackjack pays 3:2
     
