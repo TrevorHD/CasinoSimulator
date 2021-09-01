@@ -1,4 +1,4 @@
-# CasinoSimulator
+# Overview
 
 A set of text-based casino games, built in Python, that are designed to run on the command line or Python interpreter. This series contains three casino favourites: blackjack, roulette, and slots.
 
@@ -24,13 +24,15 @@ A set of text-based casino games, built in Python, that are designed to run on t
 
 # Featured Images
 
-Screenshots of gameplay from the blackjack (images 1-3) and slots (images 4-5) games are included below.
+Screenshots of gameplay from the blackjack game. In the first screenshot, the dealer draws a 5 and finishes their turn with a lower score than the player; in the second screenshot, the player draws a J and doubles down, waiting for the dealer to take their turns; in the third screenshot, the player has a Blackjack and waits for the dealer to check their hand for Blackjack.
 
 <kbd>![](https://github.com/TrevorHD/CasinoSimulator/blob/main/Screenshots/Blackjack1.png)</kbd>
 
 <kbd>![](https://github.com/TrevorHD/CasinoSimulator/blob/main/Screenshots/Blackjack2.png)</kbd>
 
 <kbd>![](https://github.com/TrevorHD/CasinoSimulator/blob/main/Screenshots/Blackjack3.png)</kbd>
+
+Screenshots of gameplay from the slots game. In the first screenshot, player does not win anything; in the second, the player matches a x2 payout and doubles their input of 10 credits.
 
 <kbd>![](https://github.com/TrevorHD/CasinoSimulator/blob/main/Screenshots/Slots1.png)</kbd>
 
